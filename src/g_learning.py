@@ -10,16 +10,19 @@ import sys
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from scipy.stats import entropy
+import pickle
 
 ################################################################################
 # CONSTANTS
 human_epsilon = 0.3
 best_arm = 5
-np.random.seed(0)
-prob_pick_best = 1 - human_epsilon
-other_prob = human_epsilon / (10 - 1)
-rho = np.ones((1, 10)) * other_prob
-rho[0][best_arm] = prob_pick_best
+seed = 0
+np.random.seed(seed)
+# prob_pick_best = 1 - human_epsilon
+# other_prob = human_epsilon / (10 - 1)
+# rho = np.ones((1, 10)) * other_prob
+# rho[0][best_arm] = prob_pick_best
+DATA_FOLDER = '../data/simulation'
 ################################################################################
 
 class GLearningAgent():
@@ -78,8 +81,9 @@ class GLearningAgent():
         return beta
 
     def kl_divergence(self):
-        p = np.zeros(self.G.shape[1])
-        p[np.argmax(self.G[0])] = 1
+        # p = np.zeros(self.G.shape[1])
+        # p[np.argmax(self.G[0])] = 1
+        p = np.exp(self.G[0])
         q = self.rho[0]
         return entropy(p, q)
 
@@ -191,8 +195,9 @@ class QLearningAgent():
         return alpha
 
     def kl_divergence(self):
-        p = np.zeros(self.Q.shape[1])
-        p[np.argmax(self.Q[0])] = 1
+        # p = np.zeros(self.Q.shape[1])
+        # p[np.argmax(self.Q[0])] = 1
+        p = np.exp(self.Q[0])
         q = rho[0]
         return entropy(p, q)
 
@@ -246,9 +251,39 @@ class QLearningAgent():
         return self.Q, stats
 
 if __name__ == "__main__":
-    num_episodes = 10000
+    num_episodes = 5000
     env = gym.make("BanditTenArmedRandomFixed-v0")
-    agent = GLearningAgent(env, k=1)
+
+    avg_rewards = [0] * 10
+    times_played = [0] * 10
+    for i in range(10):
+        env.reset()
+        if i == 0:
+            action = np.random.choice(np.arange(10))
+        else:
+            be_greedy = np.random.uniform()
+            if be_greedy > human_epsilon:
+                action = np.argmax(avg_rewards)
+            else:
+                action = np.random.choice(np.arange(10))
+        next_state, reward, done, _ = env.step(action)
+        if times_played[action] == 0:
+            times_played[action] += 1
+            avg_rewards[action] += reward
+        else:
+            avg_rewards[action] = ((avg_rewards[action] * times_played[action]) + \
+                                  reward) / (times_played[action] + 1)
+            times_played[action] += 1
+
+    print avg_rewards
+    print env.env.p_dist
+    best_arm = np.argmax(avg_rewards)
+    prob_pick_best = 1 - human_epsilon
+    other_prob = human_epsilon / (10 - 1)
+    rho = np.ones((1, 10)) * other_prob
+    rho[0][best_arm] = prob_pick_best
+
+    agent = GLearningAgent(env, k=1e-3)
     G, g_stats = agent.g_learning(num_episodes=num_episodes,
                                 max_ep_steps=500,
                                 discount=0.95,
@@ -258,37 +293,49 @@ if __name__ == "__main__":
                                 max_ep_steps=500,
                                 discount=0.95,
                                 epsilon=0.1)
-
+    mu_star = max(env.env.p_dist)
+    g_regret = []
     g_rewards = []
     t = 0
-    for r in g_stats.episode_rewards:
+    for i, r in enumerate(g_stats.episode_rewards):
         t += r
         g_rewards.append(t)
+        g_regret.append(t / (mu_star * (i+1)))
 
+    q_regret = []
     q_rewards = []
     t = 0
-    for r in q_stats.episode_rewards:
+    for i, r in enumerate(q_stats.episode_rewards):
         t += r
         q_rewards.append(t)
+        q_regret.append(t / (mu_star * (i+1)))
 
-    pkl_dict = {'g_rewards': g_rewards, 'q_rewards': q_rewards,\
-                'g_divergence': g_stats.kl_divergence, \
-                'q_divergence': q_stats.kl_divergence}
-
-    fig, axes = plt.subplots(nrows=1, ncols=2)
-    axes = np.ndarray.flatten(np.array(axes))
-    ax = axes[0]
-    ax2 = axes[1]
+    # pickle_dict = {'g_rewards': g_rewards, 'q_rewards': q_rewards,\
+    #                'g_divergence': g_stats.kl_divergence, \
+    #                'q_divergence': q_stats.kl_divergence}
+    # output = open('%s/sim_%d.pkl' % (DATA_FOLDER, seed), 'wb')
+    # pickle.dump(pickle_dict, output)
+    # output.close()
+    fig = plt.figure(figsize=(20, 8))
+    ax = fig.add_subplot(121)
+    ax2 = fig.add_subplot(122)
+    # fig, axes = plt.subplots(nrows=1, ncols=2)
+    # axes = np.ndarray.flatten(np.array(axes))
+    # ax = axes[0]
+    # ax2 = axes[1]
     ax.set_xlim(0, num_episodes)
+    ax.set_ylim(0, 1.1)
     ax2.set_xlim(0, num_episodes)
-    ax2.set_ylim(0, 4)
+    ax2.set_ylim(0, 3.5)
     x = np.arange(0, num_episodes)
 
-    ax.plot(x, g_rewards, label='G-learning')
-    ax.plot(x, q_rewards, label='Q-learning')
+    ax.plot(x, q_regret, label='Q-learning', lw=3, c='#838383')
+    ax.plot(x, g_regret, label='G-learning', lw=3, c='#e67e00')
+    ax.plot(x, [1]*num_episodes, c='k', lw=3, linestyle='dashed')
+    # ax.plot(x, [mu_star * num_episodes]* num_episodes, label='Maximum Possible Reward')
 
-    ax2.plot(x, g_stats.kl_divergence, label='G-learning')
-    ax2.plot(x, q_stats.kl_divergence, label='Q-learning')
+    ax2.plot(x, q_stats.kl_divergence, label='Q-learning', lw=3, c='#838383')
+    ax2.plot(x, g_stats.kl_divergence, label='G-learning', lw=3, c='#e67e00')
     
     lgnd = ax.legend(bbox_to_anchor=(0,1.02,1,0.2), loc="lower left")
     lgnd.legendHandles[0]._sizes = [30]

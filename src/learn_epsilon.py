@@ -8,7 +8,7 @@ from functools import partial
 import argparse
 import math
 import pickle
-# 2 1 3 = o g r
+# 2 3 1 = o r g
 ################################################################################
 # CONSTANTS/FUNCTIONS
 parser = argparse.ArgumentParser()
