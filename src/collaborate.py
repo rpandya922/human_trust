@@ -16,6 +16,7 @@ parser.add_argument('--robot', type=str, default='greedy')
 parser.add_argument('--epsilon', type=float, default=None)
 parser.add_argument('--user', type=int, default=None)
 parser.add_argument('--pretrain', type=int, default=30)
+parser.add_argument('--type', type=str, default='suggest')
 args = parser.parse_args()
 NUM_TURNS = 30
 DATA_FOLDER = "../data/user_%s" % args.user
@@ -46,7 +47,7 @@ root = Tk()
 #     Grid.rowconfigure(root, y, weight=1)
 
 sans = tkFont.Font(family='Sans', size=36)
-root.geometry("2400x800")
+root.geometry("2500x800")
 app = Window(root)
 
 num_turns = IntVar()
@@ -59,6 +60,8 @@ next_iter = BooleanVar()
 next_iter.set(False)
 arm_chosen = IntVar()
 arm_chosen.set(-1)
+user_turn = StringVar()
+user_turn.set('Human')
 
 arm_buttons = []
 for i, arm in enumerate(arms):
@@ -73,6 +76,14 @@ Label(root, text='Previous Reward: ', font=sans).grid(row=2, column=0)
 Label(root, textvariable=prev_reward, font=sans).grid(row=2, column=1)
 Label(root, text='Total Reward: ', font=sans).grid(row=3, column=0)
 Label(root, textvariable=reward, font=sans).grid(row=3, column=1)
+if args.type == 'turns':
+    Label(root, text='Turn: ', font=sans).grid(row=4, column=0)
+    Label(root, textvariable=user_turn, font=sans).grid(row=4, column=1)
+
+    def n(nex):
+        nex.set(True)
+    next_button = Button(root, text='Next', font=sans, command=partial(n, next_iter))
+    next_button.grid(row=4, column=num_arms+1)
 
 human_decsions = []
 robot_decisions = []
@@ -81,6 +92,8 @@ times_taken = []
 regret = []
 total_rewards = []
 
+################################################################################
+# PRETRAINING
 if args.robot == 'greedy':
     for n in range(args.pretrain):
         avg_rewards = [a.average for a in arms]
@@ -136,7 +149,12 @@ elif args.robot == 'random':
 reward.set(0)
 num_turns.set(0)
 prev_reward.set(0)
+next_iter.set(False)
+################################################################################
 
+################################################################################
+# COLLABORATING
+human_turn = True
 while num_turns.get() < NUM_TURNS:
     avg_rewards = [a.average for a in arms]
     if args.robot == 'greedy':
@@ -152,9 +170,16 @@ while num_turns.get() < NUM_TURNS:
     elif args.robot == 'random':
         i = np.random.choice(list(range(num_arms)))
 
-    root.update_idletasks()
-    root.update()
-    arm_buttons[i].config(fg='green')
+    if args.type == 'suggest' or (args.type == 'turns' and human_turn):
+        arm_buttons[i].config(fg='green')
+        human_turn = False
+        if args.type == 'turns':
+            next_button.config(state=DISABLED)
+    else:
+        next_button.config(state=NORMAL)
+        arm_buttons[i].config(fg='green')
+        time.sleep(0.1)
+        human_turn = True
 
     average_rewards.append(np.copy(avg_rewards))
 
@@ -171,26 +196,34 @@ while num_turns.get() < NUM_TURNS:
     total_rewards.append(reward.get())
 
     next_iter.set(False)
+    if args.type == 'turns':
+        if human_turn:
+            click_button(root, arm_buttons[i])
+            user_turn.set('Human')
+        else:
+            user_turn.set('Robot')
     for button in arm_buttons:
         button.config(relief=RAISED, state=NORMAL, fg='black')
     root.update_idletasks()
     root.update()
     time.sleep(0.1)
+################################################################################
 
 if args.robot == 'greedy':
     pickle_dict = {'arms': arms, 'human_decsions': human_decsions, 'robot_decisions': robot_decisions,\
                    'average_rewards': average_rewards, 'times_taken': times_taken, \
-                   'regret': regret, 'epsilon': epsilon, 'reward': total_rewards}
+                   'regret': regret, 'epsilon': epsilon, 'reward': total_rewards, \
+                   'condition': args.type}
     output = open('%s/greedy.pkl' % DATA_FOLDER, 'wb')
 elif args.robot == 'optimal':
     pickle_dict = {'arms': arms, 'human_decsions': human_decsions, 'robot_decisions': robot_decisions,\
                    'arm_values': average_rewards, 'times_taken': times_taken, \
-                   'regret': regret, 'reward': total_rewards}
+                   'regret': regret, 'reward': total_rewards, 'condition': args.type}
     output = open('%s/optimal.pkl' % DATA_FOLDER, 'wb')
 elif args.robot == 'random':
     pickle_dict = {'arms': arms, 'human_decsions': human_decsions, 'robot_decisions': robot_decisions,\
                    'average_rewards': average_rewards, 'times_taken': times_taken, \
-                   'regret': regret, 'reward': total_rewards}
+                   'regret': regret, 'reward': total_rewards, 'condition': args.type}
     output = open('%s/random.pkl' % DATA_FOLDER, 'wb')
 pickle.dump(pickle_dict, output)
 output.close()
