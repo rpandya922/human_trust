@@ -16,8 +16,8 @@ parser.add_argument('--user', type=int, default=None)
 args = parser.parse_args()
 NUM_TURNS = 30
 DATA_FOLDER = "../data/user_%s" % args.user
-arms = [BernoulliArm(0.6, 2, name=0), BernoulliArm(1, 1, name=1), \
-        BernoulliArm(0.3, 4, name=2), BernoulliArm(0.5, 3, name=3)]
+arms = [BernoulliArm(0.7, 2, name=0), BernoulliArm(0.2, 1, name=1), \
+        BernoulliArm(0.9, 1, name=2), BernoulliArm(0.5, 3, name=3)]
 mu_star = max([a.p * a.reward for a in arms])
 num_arms = len(arms)
 ################################################################################

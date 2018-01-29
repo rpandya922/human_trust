@@ -24,14 +24,14 @@ if args.epsilon is None:
 else:
     epsilon = args.epsilon
 if args.robot == 'greedy':
-    arms = [BernoulliArm(0.7, 2, name=0), BernoulliArm(0.2, 1, name=1), \
-            BernoulliArm(0.9, 1, name=2), BernoulliArm(0.5, 3, name=3)]
+    arms = [BernoulliArm(0.5, 3, name=0), BernoulliArm(0.2, 1, name=1), \
+            BernoulliArm(0.9, 1, name=2), BernoulliArm(0.7, 2, name=3)]
 elif args.robot == 'optimal':
-    arms = [BernoulliArm(0.4, 4, name=0), BernoulliArm(1, 1, name=1), \
-            BernoulliArm(0.5, 3, name=2), BernoulliArm(0.6, 2, name=3)]
+    arms = [BernoulliArm(0.9, 1, name=0), BernoulliArm(0.7, 2, name=1), \
+            BernoulliArm(0.5, 3, name=2), BernoulliArm(0.2, 1, name=3)]
 elif args.robot == 'random':
-    arms = [BernoulliArm(0.8, 1, name=0), BernoulliArm(0.9, 1, name=1), \
-            BernoulliArm(0.6, 3, name=2), BernoulliArm(0.4, 2, name=3)]
+    arms = [BernoulliArm(0.2, 1, name=0), BernoulliArm(0.7, 2, name=1), \
+            BernoulliArm(0.9, 1, name=2), BernoulliArm(0.5, 3, name=3)]
 mu_star = max([a.p * a.reward for a in arms])
 num_arms = len(arms)
 ################################################################################
