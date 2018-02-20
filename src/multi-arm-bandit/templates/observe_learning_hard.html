@@ -1,0 +1,45 @@
+<div id="container-exp">
+    <div class="trial">
+        <div class="row">
+            <button id="arm-0-value" class="btn btn-lg disabled">Arm 1</button>
+            <button id="arm-1-value" class="btn btn-lg disabled">Arm 2</button>
+            <button id="arm-2-value" class="btn btn-lg disabled">Arm 3</button>
+            <button id="arm-3-value" class="btn btn-lg disabled">Arm 4</button>
+            <button id="arm-4-value" class="btn btn-lg disabled">Arm 5</button>
+            <button id="arm-5-value" class="btn btn-lg disabled">Arm 6</button>
+            <button id="arm-6-value" class="btn btn-lg disabled">Arm 7</button>
+            <button id="arm-7-value" class="btn btn-lg disabled">Arm 8</button>
+            <button id="arm-8-value" class="btn btn-lg disabled">Arm 9</button>
+            <button id="arm-9-value" class="btn btn-lg disabled">Arm 10</button>
+        </div>
+        <div class="row">
+            <button type="button" id="arm-0" class="btn btn-secondary btn-lg">Arm 1</button>
+            <button type="button" id="arm-1" class="btn btn-secondary btn-lg">Arm 2</button>
+            <button type="button" id="arm-2" class="btn btn-secondary btn-lg">Arm 3</button>
+            <button type="button" id="arm-3" class="btn btn-secondary btn-lg">Arm 4</button>
+            <button type="button" id="arm-4" class="btn btn-secondary btn-lg">Arm 5</button>
+            <button type="button" id="arm-5" class="btn btn-secondary btn-lg">Arm 6</button>
+            <button type="button" id="arm-6" class="btn btn-secondary btn-lg">Arm 7</button>
+            <button type="button" id="arm-7" class="btn btn-secondary btn-lg">Arm 8</button>
+            <button type="button" id="arm-8" class="btn btn-secondary btn-lg">Arm 9</button>
+            <button type="button" id="arm-9" class="btn btn-secondary btn-lg">Arm 10</button>
+        </div>
+
+        <div class="row">
+            <h1 style="display: inline">Robot: </h1><h1 style="display: inline" id="robot-name"></h1>
+            <p></p>
+            <h1 style="display: inline">Iteration: </h1><h1 style="display: inline" id="iteration"></h1>
+            <p></p>
+            <h1 style="display: inline">Previous Arm: </h1><h1 style="display: inline" id="previous-arm"></h1>
+            <p></p>
+            <h1 style="display: inline">Previous Reward: </h1><h1 style="display: inline" id="previous-reward"></h1>
+            <p></p>
+            <h1 style="display: inline">Total Reward: </h1><h1 style="display: inline" id="reward"></h1>
+        </div>
+
+        <div class="row">
+            <button type="button" id="next-iteration" class="btn btn-primary btn-lg" onclick="next_iteration()">
+                Next <span class="glyphicon glyphicon-arrow-right"></button>
+        </div>
+    </div>
+</div>

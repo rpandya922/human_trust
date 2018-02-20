@@ -1,0 +1,28 @@
+<div id="container-instructions">
+
+    <div class="instructions well">
+        <div id="message"></div>
+        <div id="observe-instructions" style="display: none">
+            In this task, the robot knows nothing about the arms and is learning to maximize its total reward by selecting them. At each iteration, the highlighted arm will indicate the arm the robot wants to pull next. You will simply need to click the "Next" button to progress through the robot's decisions. You do not need to click the other buttons yourself, simply observe how the robot is learning.
+        </div>
+        <div id="collaborate-instructions" style="display: none">
+            In this task, the robot has already gotten to learn about the arms for 30 iterations. The highlighted arm is the one the robot has decided is the best one. These arms are different than ones you have seen before, and your task is to maximize your reward over 30 iterations. Click any arm to advance through each iteration.
+        </div>
+    </div>
+
+    <div class="instructionsnav">
+        <div class="row">
+            <div class="col-xs-2">
+                <!-- no previous button on first screen -->
+            </div>
+            <div class="col-xs-8">
+            </div>
+            <div class="col-xs-2">
+                <button type="button" id="next" value="next" class="btn btn-primary btn-lg continue" onclick="next()">
+                Next <span class="glyphicon glyphicon-arrow-right"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

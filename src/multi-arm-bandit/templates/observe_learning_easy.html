@@ -1,8 +1,12 @@
 <div id="container-exp">
     <div class="trial">
         <div class="row">
-            <button type="button" id="arm-0" class="btn btn-secondary btn-lg" onclick="clickArm(0)">Arm 1</button>
-            <button type="button" id="arm-1" class="btn btn-secondary btn-lg" onclick="clickArm(1)">Arm 2</button>
+            <button id="arm-0-value" class="btn btn-lg disabled">Arm 1</button>
+            <button id="arm-1-value" class="btn btn-lg disabled">Arm 2</button>
+        </div>
+        <div class="row">
+            <button type="button" id="arm-0" class="btn btn-secondary btn-lg">Arm 1</button>
+            <button type="button" id="arm-1" class="btn btn-secondary btn-lg">Arm 2</button>
         </div>
 
         <div class="row">
@@ -16,8 +20,10 @@
             <p></p>
             <h1 style="display: inline">Total Reward: </h1><h1 style="display: inline" id="reward"></h1>
         </div>
+
         <div class="row">
-            <button type="button" id="finish" class="btn btn-primary btn-lg disabled">Finish Collaborating</button>
+            <button type="button" id="next-iteration" class="btn btn-primary btn-lg" onclick="next_iteration()">
+                Next <span class="glyphicon glyphicon-arrow-right"></button>
         </div>
     </div>
 </div>
