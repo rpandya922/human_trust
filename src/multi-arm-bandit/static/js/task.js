@@ -39,7 +39,7 @@ var GREEDY_COLOR = 'btn-success';
 var GREEDY2_COLOR = 'btn-danger';
 var OPTIMAL_COLOR = 'btn-primary';
 var RANDOM_COLOR = 'btn-warning';
-const NUM_ITERATIONS = 5;
+const NUM_ITERATIONS = 30;
 
 //Make sure color and order are shuffled the same way
 var robot_order = ["greedy", "greedy2", "optimal", "random"];
@@ -116,8 +116,8 @@ var initialize_arms = function(difficulty) {
 		probabilities.push(probability);
 		expected_rewards.splice(idx, 1);
 	}
-	console.log(payoffs);
-	console.log(probabilities);
+	// console.log(payoffs);
+	// console.log(probabilities);
 	return [payoffs, probabilities];
 }
 
@@ -239,7 +239,13 @@ var Training = function() {
 	}
 
 	finish = function() {
-		currentview = new BetweenConditions(0, 0, {"pretrain": 100, "epsilon": 0.1}, "observe");
+		document.getElementById('finish').classList.remove("disabled");
+		for (var i = 0; i < num_arms; i++) {
+			document.getElementById('arm-' + String(i)).classList.add("disabled");
+		}
+		document.getElementById('finish').onclick = function() {
+			currentview = new BetweenConditions(0, 0, {"pretrain": 100, "epsilon": 0.1}, "observe");
+		};
 	}
 
 	update();
@@ -288,7 +294,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
 	} else if (robot_type == "greedy2") {
 		HIGHLIGHT_COLOR = GREEDY2_COLOR;
 	}
-	console.log(robot_args['epsilon']);
+	// console.log(robot_args['epsilon']);
 
 	// const num_arms = 4;
 	var totalReward = 0;
@@ -545,13 +551,13 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 			}
 		}
 	}
-	var recordPretrainData = function(arm) {
+	var recordPretrainData = function(arm, payoff) {
 		all_pretrain_decisions.push(arm);
 		all_pretrain_rewards.push(payoff);
 	}
 
 	clickArm = function(arm_idx, robot_click = false) {
-		console.log(arms_disabled);
+		// console.log(arms_disabled);
 		if (arms_disabled && !robot_click) {
 			return;
 		}
@@ -603,7 +609,7 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 
 		averages[arm_idx] = ((averages[arm_idx] * times_chosen[arm_idx]) + payoff) / (times_chosen[arm_idx] + 1)
 		times_chosen[arm_idx] += 1
-		recordPretrainData(arm_idx);
+		recordPretrainData(arm_idx, payoff);
 
 		iteration += 1;
 		var ret = chooseNextArm();
@@ -655,7 +661,7 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 					'times_chosen': all_times_chosen, 'average_rewards': all_average_rewards, 
 					'human_decisions': all_human_decisions, 'robot_decisions': all_robot_decisions,
 					'all_rewards': all_total_rewards, 'arm_payoffs': payoffs, 'arm_probabilities': probabilities,
-					'pretrain_decisions': all_pretrain_decisions, 'pretrain_rewards': all_pretrain_rewards};
+					'pretrain_decisions': all_pretrain_decisions, 'pretrain_payoffs': all_pretrain_rewards};
 		psiTurk.recordUnstructuredData(type, all_data);
 		// psiTurk.recordUnstructuredData('robot_type', robot_type);
 		// psiTurk.recordUnstructuredData('difficulty', difficulty);
@@ -714,7 +720,6 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 		to_highlight = [];
 		var ret = chooseNextArm();
 		pretrain(ret[0]);
-		all_pretrain_decisions.push()
 	}
 	pretrain_averages = averages.slice();
 	// reset variables, iteration number necessary for math to work
