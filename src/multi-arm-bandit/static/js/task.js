@@ -10,7 +10,7 @@ var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode);
 var mycondition = condition;  // these two variables are passed by the psiturk server process
 var mycounterbalance = counterbalance;  // they tell you which condition you have been assigned to
 // they are not used in the stroop code but may be useful to you
-
+console.log(mycondition);
 // All pages to be loaded
 var pages = [
 	"instructions/instruct-1.html",
@@ -21,7 +21,8 @@ var pages = [
 	"observe_learning_easy.html",
 	"observe_learning_hard.html",
 	"between_conditions.html", 
-	"postquestionnaire.html"
+	"postquestionnaire.html",
+	"robot_question.html"
 ];
 
 psiTurk.preloadPages(pages);
@@ -40,20 +41,13 @@ var GREEDY2_COLOR = 'btn-danger';
 var OPTIMAL_COLOR = 'btn-primary';
 var RANDOM_COLOR = 'btn-warning';
 const NUM_ITERATIONS = 2;
+const BAD_COLOR = "#000000";
+const OKAY_COLOR = "#6C6C6C";
+const GOOD_COLOR = "#D9D9D9";
+// const BAD_COLOR = "#E5001E";
+// const OKAY_COLOR = "#D2B800";
+// const GOOD_COLOR = "#16BF00";
 
-//Make sure color and order are shuffled the same way
-var robot_order = ["greedy", "greedy2", "optimal", "random"];
-var robot_colors = ["Green", "Red", "Blue", "Yellow"];
-var difficulty_order = ["easy", "hard"];
-var observation_difficulty_order = ["medium"];
-var collaboration_order = ["suggest", "turns"];
-var colors_easy = ["#16BF00", "#E5001E"];
-var colors_medium = ["#16BF00", "#D2B800", "#D2B800", "#E5001E"]
-// var colors_hard = ["#16BF00", "#43C300", "#71C700", "#A1CB00", "#CFCC00",
-// 			  	   "#D4A100", "#D87400", "#DC4500", "#E01400", "#E5001E"];
-var colors_hard = ["#16BF00", "#16BF00", "#16BF00", "#D2B800", "#D2B800",
-			  	   "#D2B800", "#D2B800", "#E5001E", "#E5001E", "#E5001E"];
-var human_selection;
 
 function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
@@ -62,6 +56,34 @@ function shuffle(a) {
     }
     return a;
 }
+function match_shuffle(a, order) {
+	var ret = [];
+	for (i = 0; i < order.length; i++) {
+		ret.push(a[order[i]]);
+	}
+	return ret;
+}
+//Make sure color and order are shuffled the same way
+var robot_shuffle_order = shuffle(_.range(4));
+var robot_order = match_shuffle(["greedy", "greedy2", "optimal", "random"], robot_shuffle_order);
+var robot_colors = match_shuffle(["Green", "Red", "Blue", "Yellow"], robot_shuffle_order);
+console.log(robot_order);
+console.log(robot_colors);
+var difficulty_order = ["easy", "hard"];
+var observation_difficulty_order = ["medium"];
+var collaboration_order = ["suggest", "turns"];
+var colors_easy = [GOOD_COLOR, BAD_COLOR];
+var colors_worth_easy = ["Good", "Bad"];
+var colors_medium = [GOOD_COLOR, OKAY_COLOR, OKAY_COLOR, BAD_COLOR];
+var colors_worth_medium = ["Good", "Okay", "Okay", "Bad"];
+// var colors_hard = ["#16BF00", "#43C300", "#71C700", "#A1CB00", "#CFCC00",
+// 			  	   "#D4A100", "#D87400", "#DC4500", "#E01400", "#E5001E"];
+var colors_hard = [GOOD_COLOR, GOOD_COLOR, GOOD_COLOR, OKAY_COLOR, OKAY_COLOR,
+			  	   OKAY_COLOR, OKAY_COLOR, BAD_COLOR, BAD_COLOR, BAD_COLOR];
+var colors_worth_hard = ["Good", "Good", "Good", "Okay", "Okay", "Okay", "Okay", "Bad", "Bad", "Bad"];
+var human_selection;
+
+
 var argmax = function(arr) {
 	var best = -1;
 	var best_idx;
@@ -220,12 +242,16 @@ var initialize_arms_old = function(difficulty) {
 var color_arm_values = function(payoffs, probabilities) {
 	var num_arms = payoffs.length;
 	var colors;
+	var colors_worth;
 	if (num_arms == 2) {
 		colors = colors_easy;
+		colors_worth = colors_worth_easy;
 	} else if (num_arms == 4) {
 		colors = colors_medium;
+		colors_worth = colors_worth_medium;
 	} else {
 		colors = colors_hard;
+		colors_worth = colors_worth_hard;
 	}
 	var expected_rewards = [];
 	for (i=0; i < num_arms; i++) {
@@ -233,13 +259,14 @@ var color_arm_values = function(payoffs, probabilities) {
 	}
 	for (i=0; i < num_arms; i++) {
 		arm = argmax(expected_rewards);
-		box = document.getElementById("arm-" + String(arm) + "-value")
+		box = document.getElementById("arm-" + String(arm) + "-value");
 		box.style.color = colors[i];
 		box.style.backgroundColor = colors[i];
+		document.getElementById("arm-" + String(arm) + "-value-text").innerText = colors_worth[i];
 		expected_rewards[arm] = -1;
 	}
 }
-var in_range = function(x) {
+var in_range = function(x, num_arms) {
 	for (var i = 1; i <= num_arms; i++) {
 		if (parseInt(x) == i) {
 			return true;
@@ -250,8 +277,8 @@ var in_range = function(x) {
 var prompt_arms = function(num_arms) {
 	do {
 	    var selection = prompt("Which arm would you pick? [1-" + String(num_arms) + "]", "");
-	} while(selection == null || selection == "" || !in_range(selection));
-	human_selection = selection;
+	} while(selection == null || selection == "" || !in_range(selection, num_arms));
+	human_selection = parseInt(selection);
 	return selection;
 }
 var ask_for_decision = function(num_arms) {
@@ -311,9 +338,9 @@ var BetweenConditions = function(next_robot_idx, next_diff_idx, next_robot_args,
 	}
 	next = function() {
 		if (next_condition == "observe"){
-			currentview = new ObserveRobot(next_robot_idx, next_diff_idx, next_robot_args);
+			currentview = new ObserveRobot(next_robot_idx, next_diff_idx, $.extend(true, {}, next_robot_args));
 		} else if (next_condition == "collaborate") {
-			currentview = new Collaborate(next_robot_idx, next_diff_idx, 0, next_robot_args);
+			currentview = new Collaborate(next_robot_idx, next_diff_idx, 0, $.extend(true, {},next_robot_args));
 			// currentview = new Collaborate(0, 0, 0, next_robot_args);
 		}
 	}
@@ -332,6 +359,21 @@ var Training = function() {
 	var arms_disabled = false;
 	var previous_arm_chosen;
 
+	// data to be saved
+	var all_times_chosen = [];
+	var all_average_rewards = [];
+	var all_total_rewards = [];
+	var all_payoffs = [];
+	var all_human_decisions = [];
+
+	var recordData = function(arm, payoff) {
+		all_times_chosen.push(times_chosen.slice());
+		all_average_rewards.push(averages.slice());
+		all_total_rewards.push(totalReward);
+		all_human_decisions.push(arm);
+		all_payoffs.push(payoff);
+	}
+
 	clickArm = function(arm_idx) {
 		if (arms_disabled) {
 			return;
@@ -348,6 +390,7 @@ var Training = function() {
 
 		totalReward += payoff;
 		prevReward = payoff;
+		recordData(arm_idx, payoff);
 		iteration += 1;
 		previous_arm_chosen = arm_idx + 1;
 		
@@ -370,12 +413,24 @@ var Training = function() {
 	}
 
 	finish = function() {
+		var type = "training";
+		var all_data = {'total_reward': totalReward, 'times_chosen': all_times_chosen, 
+						'average_rewards': all_average_rewards, 'human_decisions': all_human_decisions, 
+						'all_total_rewards': all_total_rewards, 'all_payoffs': all_payoffs,
+						'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
+		psiTurk.recordUnstructuredData(type, all_data);
+		psiTurk.saveData();
+
 		document.getElementById('finish').classList.remove("disabled");
 		for (var i = 0; i < num_arms; i++) {
 			document.getElementById('arm-' + String(i)).classList.add("disabled");
 		}
 		document.getElementById('finish').onclick = function() {
-			currentview = new BetweenConditions(0, 0, {"pretrain": 0, "epsilon": 0.1}, "observe");
+			if (mycondition == 0) {
+				currentview = new BetweenConditions(0, 0, {"pretrain": 0, "epsilon": 0.1}, "observe");
+			} else if (mycondition == 1) {
+				currentview = new BetweenConditions(0, 0, {"pretrain": 0, "epsilon": 0.1}, "collaborate");
+			}
 		};
 	}
 
@@ -444,6 +499,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
 	var all_times_chosen = [];
 	var all_average_rewards = [];
 	var all_total_rewards = [];
+	var all_payoffs = [];
 	var all_robot_decisions = [];
 
 	var chooseNextArm = function() {
@@ -472,11 +528,12 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
 		}
 	};
 
-	var recordData = function(arm) {
+	var recordData = function(arm, payoff) {
 		all_times_chosen.push(times_chosen.slice());
 		all_average_rewards.push(averages.slice());
 		all_total_rewards.push(totalReward);
-		all_robot_decisions.push(arm);
+		all_payoffs.push(payoff);
+		all_robot_decisions.push([arm, to_highlight.slice()]);
 	}
 
 	next_iteration = function() {
@@ -513,7 +570,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
 
 		totalReward += payoff;
 		prevReward = payoff;
-		recordData(next_idx);
+		recordData(next_idx, payoff);
 		iteration += 1;
 		if (iteration >= NUM_ITERATIONS) {
 			finish();
@@ -529,11 +586,13 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
 	};
 
 	finish = function() {
-		type = robot_type + "_" + difficulty + "_observe"
-		all_data = {'robot_type': robot_type, 'difficulty': difficulty, 'robot_args': robot_args, 
-					'total_reward': totalReward, 'times_chosen': all_times_chosen, 
-					'average_rewards': all_average_rewards, 'robot_decisions': all_robot_decisions,
-					'all_rewards': all_total_rewards, 'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
+		var type = robot_type + "_" + difficulty + "_observe"
+		var all_data = {'robot_type': robot_type, 'difficulty': difficulty, 'robot_args': robot_args, 
+						'total_reward': totalReward, 'times_chosen': all_times_chosen, 
+						'average_rewards': all_average_rewards, 'robot_decisions': all_robot_decisions,
+						'all_total_rewards': all_total_rewards, 'all_payoffs': all_payoffs,
+						'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
+		psiTurk.recordUnstructuredData(type, all_data);
 		psiTurk.saveData();
 		
 		// unhighlight_arms([_.range(num_arms)]);
@@ -617,11 +676,10 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 	var all_times_chosen = [];
 	var all_average_rewards = [];
 	var all_total_rewards = [];
+	var all_payoffs = [];
 	var all_human_decisions = [];
 	var all_before_suggest_decisions = [];
 	var all_robot_decisions = [];
-	// var all_rewards = [];
-	// var decisions = [];
 	var all_pretrain_decisions = [];
 	var all_pretrain_rewards = [];
 
@@ -655,12 +713,13 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 		}
 	};
 
-	var recordData = function(arm) {
+	var recordData = function(arm, payoff) {
 		all_times_chosen.push(times_chosen.slice());
 		all_average_rewards.push(averages.slice());
 		all_total_rewards.push(totalReward);
+		all_payoffs.push(payoff);
 		if (collaboration_type == "suggest") {
-			all_robot_decisions.push(to_highlight);
+			all_robot_decisions.push(to_highlight.slice());
 			all_human_decisions.push(arm);
 		} else if (collaboration_type == "turns") {
 			if (turn == "robot") {
@@ -699,7 +758,7 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 
 		totalReward += payoff;
 		prevReward = payoff;
-		recordData(arm_idx);
+		recordData(arm_idx, payoff);
 		iteration += 1;
 		previous_arm_chosen = arm_idx + 1;
 		
@@ -793,15 +852,17 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 	}
 
 	finish = function() {
-		type = robot_type + "_" + difficulty + "_collaborate_" + collaboration_type
-		all_data = {'robot_type': robot_type, 'difficulty': difficulty, 'robot_args': robot_args, 
+		var type = robot_type + "_" + difficulty + "_collaborate_" + collaboration_type
+		var all_data = {'robot_type': robot_type, 'difficulty': difficulty, 'robot_args': robot_args, 
 					'collaboration_type': collaboration_type, 'total_reward': totalReward,
 					'times_chosen': all_times_chosen, 'average_rewards': all_average_rewards, 
 					'human_decisions': all_human_decisions, 'robot_decisions': all_robot_decisions,
-					'all_rewards': all_total_rewards, 'arm_payoffs': payoffs, 'arm_probabilities': probabilities,
+					'all_total_rewards': all_total_rewards, 'all_payoffs': all_payoffs,
+					'arm_payoffs': payoffs, 'arm_probabilities': probabilities,
 					'pretrain_decisions': all_pretrain_decisions, 'pretrain_payoffs': all_pretrain_rewards,
 					'before_suggest_decisions': all_before_suggest_decisions};
 		psiTurk.recordUnstructuredData(type, all_data);
+		psiTurk.saveData();
 		// psiTurk.recordUnstructuredData('robot_type', robot_type);
 		// psiTurk.recordUnstructuredData('difficulty', difficulty);
 		// psiTurk.recordUnstructuredData('robot_args', robot_args);
@@ -812,7 +873,6 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 		// psiTurk.recordUnstructuredData('average_rewards', all_average_rewards);
 		// psiTurk.recordUnstructuredData('human_decisions', human_decisions);
 		// psiTurk.recordUnstructuredData('robot_decisions', robot_decisions);
-		psiTurk.saveData();
 
 		// unhighlight_arms([_.range(num_arms)]);
 		arms_disabled = true;
@@ -823,9 +883,13 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 		document.getElementById('finish').onclick = function() {
 			if (difficulty_idx == difficulty_order.length - 1) {
 				if (robot_idx == robot_order.length - 1) {
-					currentview = new Questionnaire();
+					currentview = new Questionnaire(robot_idx, 0, 0, robot_args, "", true);
 				} else {
-					currentview = new BetweenConditions(robot_idx + 1, 0, robot_args, "observe");
+					if (mycondition == 0) {
+						currentview = new Questionnaire(robot_idx, robot_idx + 1, 0, robot_args, "observe");
+					} else if (mycondition == 1) {
+						currentview = new Questionnaire(robot_idx, robot_idx + 1, 0, robot_args, "collaborate");
+					}
 				}
 			} else {
 				currentview = new BetweenConditions(robot_idx, difficulty_idx + 1, robot_args, "collaborate");
@@ -872,18 +936,40 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 	window.setTimeout(first_iteration, 100);
 };
 
-var Questionnaire = function() {
+var FinalQuestionnaire = function() {
 	psiTurk.showPage('postquestionnaire.html');
 
 	finish = function() {
-		trust1 = document.querySelector('input[name="robot-green-trust"]:checked').value;
-		trust2 = document.querySelector('input[name="robot-red-trust"]:checked').value;
-		trust3 = document.querySelector('input[name="robot-yellow-trust"]:checked').value;
-		psiTurk.recordUnstructuredData("trust_robot_green", trust1);
-		psiTurk.recordUnstructuredData("trust_robot_red", trust2);
-		psiTurk.recordUnstructuredData("trust_robot_yellow", trust3);
+		if (document.getElementById("age").value == "" || document.getElementById("age").value == null) {
+			return;
+		}
+		var gender = document.querySelector('input[name="gender"]:checked').value;
+		var age = document.getElementById("age").value;
+		psiTurk.recordUnstructuredData("gender", gender);
+		psiTurk.recordUnstructuredData("age", age);
+		psiTurk.recordUnstructuredData("robot_order", robot_order.slice());
+		psiTurk.recordUnstructuredData("robot_colors", robot_colors.slice());
+		psiTurk.recordUnstructuredData("observation_difficulty_order", observation_difficulty_order.slice());
+		psiTurk.recordUnstructuredData("collaborate_difficulty_order", difficulty_order.slice());
 		psiTurk.saveData();
 		psiTurk.completeHIT();
+	}
+}
+
+var Questionnaire = function(prev_robot_idx, next_robot_idx, next_diff_idx, next_robot_args, next_condition, final_robot = false) {
+	psiTurk.showPage('robot_question.html');
+	var robot = robot_colors[prev_robot_idx];
+	document.getElementById('robot-name').innerText = robot;
+	finish = function() {
+		var trust = document.querySelector('input[name="robot-trust"]:checked').value;
+		psiTurk.recordUnstructuredData("trust_robot_" + String(robot), trust);
+		psiTurk.saveData();
+		if (final_robot) {
+			currentview = new FinalQuestionnaire();
+			return;	
+		} else {
+			currentview = new BetweenConditions(next_robot_idx, next_diff_idx, next_robot_args, next_condition);
+		}
 	}
 }
 
@@ -896,11 +982,6 @@ var currentview;
 $(window).load( function(){
     psiTurk.doInstructions(
     	instructionPages, // a list of pages you want to display in sequence
-    	function() { // currentview = new ObserveRobot(0, 0, {"pretrain": 30, "epsilon": 0.1, "difficulty": "easy"}); 
-    	// currentview = new Collaborate("optimal", {'pretrain': 0, "epsilon": 0.1, "difficulty": "hard"}, "turns");
-    	// currentview = new BetweenConditions(0, 0, {"pretrain": 100, "epsilon": 0.1}, "observe");
-    	// currentview = new Questionnaire();
-    	currentview = new Training();
-    }
+    	function() { currentview = new Training(); }
     );
 });

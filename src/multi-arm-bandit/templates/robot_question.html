@@ -1,0 +1,46 @@
+<div id="container-questionnaire">
+    <h2>Please answer the following questions about the Robot you interacted with.</h2>
+
+    <div class="instructions well">
+
+        <form id="postquiz" action="debrief" method="post">
+
+
+            <!-- beginning of a question -->
+            <div class="question">
+                <div class="col-md-12">
+                    <h3>"I trusted the <div id="robot-name" style="display: inline;"></div> Robot"</h3>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <form>
+                            <label class="radio-inline"><input type="radio" name="robot-trust" value="1">Strongly Disagree</label>
+                            <label class="radio-inline"><input type="radio" name="robot-trust" value="2">Disagree</label>
+                            <label class="radio-inline"><input type="radio" name="robot-trust" value="3">Somewhat Disagree</label>
+                            <label class="radio-inline"><input type="radio" name="robot-trust" value="4">Neutral</label>
+                            <label class="radio-inline"><input type="radio" name="robot-trust" value="5">Somewhat Agree</label>
+                            <label class="radio-inline"><input type="radio" name="robot-trust" value="6">Agree</label>
+                            <label class="radio-inline"><input type="radio" name="robot-trust" value="7">Strongly Agree</label>
+                      </form>
+                    </div>
+                </div>
+            </div>
+            <!-- end of a question -->
+    <hr />
+
+    <div class="instructionsnav">
+        <div class="row">
+            <div class="col-xs-2">
+            </div>
+            <div class="col-xs-7">
+            </div>
+            <div class="col-xs-3">
+                <button type="button" id="next" value="next" class="btn btn-primary btn-lg continue" onclick="finish()">
+                    Next Robot <span class="glyphicon glyphicon-arrow-right"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+</div>
