@@ -1,6 +1,12 @@
 <div id="container-exp">
     <div class="trial">
         <div class="row">
+            <button id="arm-0-value" class="btn btn-lg disabled">Arm 1</button>
+            <button id="arm-1-value" class="btn btn-lg disabled">Arm 2</button>
+            <button id="arm-2-value" class="btn btn-lg disabled">Arm 3</button>
+            <button id="arm-3-value" class="btn btn-lg disabled">Arm 4</button>
+        </div>
+        <div class="row">
             <button type="button" id="arm-0" class="btn btn-secondary btn-lg">Arm 1</button>
             <button type="button" id="arm-1" class="btn btn-secondary btn-lg">Arm 2</button>
             <button type="button" id="arm-2" class="btn btn-secondary btn-lg">Arm 3</button>
@@ -8,11 +14,15 @@
         </div>
 
         <div class="row">
+            <h1 style="display: inline">Robot: </h1><h1 style="display: inline" id="robot-name"></h1>
+            <p></p>
             <h1 style="display: inline">Iteration: </h1><h1 style="display: inline" id="iteration"></h1>
+            <p></p>
+            <h1 style="display: inline">Previous Arm: </h1><h1 style="display: inline" id="previous-arm"></h1>
             <p></p>
             <h1 style="display: inline">Previous Reward: </h1><h1 style="display: inline" id="previous-reward"></h1>
             <p></p>
-            <h1 style="display: inline">Reward: </h1><h1 style="display: inline" id="reward"></h1>
+            <h1 style="display: inline">Total Reward: </h1><h1 style="display: inline" id="reward"></h1>
         </div>
 
         <div class="row">
