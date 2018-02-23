@@ -10,7 +10,7 @@ var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode);
 var mycondition = condition;  // these two variables are passed by the psiturk server process
 var mycounterbalance = counterbalance;  // they tell you which condition you have been assigned to
 // they are not used in the stroop code but may be useful to you
-console.log(mycondition);
+// console.log(mycondition);
 // All pages to be loaded
 var pages = [
 	"instructions/instruct-1.html",
@@ -40,7 +40,7 @@ var GREEDY_COLOR = 'btn-success';
 var GREEDY2_COLOR = 'btn-danger';
 var OPTIMAL_COLOR = 'btn-primary';
 var RANDOM_COLOR = 'btn-warning';
-const NUM_ITERATIONS = 2;
+const NUM_ITERATIONS = 30;
 const BAD_COLOR = "#000000";
 const OKAY_COLOR = "#6C6C6C";
 const GOOD_COLOR = "#D9D9D9";
@@ -67,8 +67,8 @@ function match_shuffle(a, order) {
 var robot_shuffle_order = shuffle(_.range(4));
 var robot_order = match_shuffle(["greedy", "greedy2", "optimal", "random"], robot_shuffle_order);
 var robot_colors = match_shuffle(["Green", "Red", "Blue", "Yellow"], robot_shuffle_order);
-console.log(robot_order);
-console.log(robot_colors);
+// console.log(robot_order);
+// console.log(robot_colors);
 var difficulty_order = ["easy", "hard"];
 var observation_difficulty_order = ["medium"];
 var collaboration_order = ["suggest", "turns"];
@@ -78,11 +78,12 @@ var colors_medium = [GOOD_COLOR, OKAY_COLOR, OKAY_COLOR, BAD_COLOR];
 var colors_worth_medium = ["Good", "Okay", "Okay", "Bad"];
 // var colors_hard = ["#16BF00", "#43C300", "#71C700", "#A1CB00", "#CFCC00",
 // 			  	   "#D4A100", "#D87400", "#DC4500", "#E01400", "#E5001E"];
-var colors_hard = [GOOD_COLOR, GOOD_COLOR, GOOD_COLOR, OKAY_COLOR, OKAY_COLOR,
-			  	   OKAY_COLOR, OKAY_COLOR, BAD_COLOR, BAD_COLOR, BAD_COLOR];
-var colors_worth_hard = ["Good", "Good", "Good", "Okay", "Okay", "Okay", "Okay", "Bad", "Bad", "Bad"];
+// var colors_hard = [GOOD_COLOR, GOOD_COLOR, GOOD_COLOR, OKAY_COLOR, OKAY_COLOR,
+// 			  	   OKAY_COLOR, OKAY_COLOR, BAD_COLOR, BAD_COLOR, BAD_COLOR];
+// var colors_worth_hard = ["Good", "Good", "Good", "Okay", "Okay", "Okay", "Okay", "Bad", "Bad", "Bad"];
+var colors_hard = [GOOD_COLOR, GOOD_COLOR, OKAY_COLOR, OKAY_COLOR, BAD_COLOR, BAD_COLOR];
+var colors_worth_hard = ["Good", "Good", "Okay", "Okay", "Bad", "Bad"];
 var human_selection;
-
 
 var argmax = function(arr) {
 	var best = -1;
@@ -123,7 +124,8 @@ var initialize_arms = function(difficulty, robot_color, condition) {
 			if (difficulty == "easy") {
 				return [[3, 2], [0.3333333333333333, 1]];
 			} else if (difficulty == "hard") {
-				return [[4,3,4,2,3,3,4,2,4,4], [0.5,1,0.25,0.5,1,1,0.5,1,0.5,0.25]];
+				// return [[4,3,4,2,3,3,4,2,4,4], [0.5,1,0.25,0.5,1,1,0.5,1,0.5,0.25]];
+				return [[3, 3, 3, 3, 4, 1], [0.3333333333333333, 1, 0.666666666666666, 0.666666666666666, 0.75, 1]];
 			}
 		}
 	} else if (robot_color == "Red") {
@@ -135,7 +137,8 @@ var initialize_arms = function(difficulty, robot_color, condition) {
 			if (difficulty == "easy") {
 				return [[2,3], [1,0.3333333333333333]];
 			} else if (difficulty == "hard") {
-				return [[4,4,1,2,1,4,4,2,3,4], [0.5,0.75,1,1,1,0.75,0.5,0.5,0.6666666666666666,0.75]];
+				// return [[4,4,1,2,1,4,4,2,3,4], [0.5,0.75,1,1,1,0.75,0.5,0.5,0.6666666666666666,0.75]];
+				return [[4, 3, 4, 4, 3, 3], [0.25, 0.6666666666666666, 0.75, 0.75, 0.6666666666666666, 0.3333333333333333]];
 			}
 		}
 	} else if (robot_color == "Blue") {
@@ -147,7 +150,8 @@ var initialize_arms = function(difficulty, robot_color, condition) {
 			if (difficulty == "easy") {
 				return [[3, 4], [0.3333333333333333,0.5]];
 			} else if (difficulty == "hard") {
-				return [[2,4,4,3,4,2,2,3,3,3], [0.5,0.5,0.5,0.3333333333333333,0.75,0.5,1,0.6666666666666666,1,1]];
+				// return [[2,4,4,3,4,2,2,3,3,3], [0.5,0.5,0.5,0.3333333333333333,0.75,0.5,1,0.6666666666666666,1,1]];
+				return [[4, 4, 3, 3, 3, 4], [0.75, 0.25, 1, 0.6666666666666666, 0.6666666666666666, 0.25]];
 			}
 		}
 	} else if (robot_color == "Yellow") {
@@ -159,7 +163,8 @@ var initialize_arms = function(difficulty, robot_color, condition) {
 			if (difficulty == "easy") {
 				return [[1, 2], [1, 1]];
 			} else if (difficulty == "hard") {
-				return [[3,2,2,2,4,4,2,1,3,3], [1,1,1,0.5,0.75,0.75,1,1,0.3333333333333333,0.6666666666666666]];
+				// return [[3,2,2,2,4,4,2,1,3,3], [1,1,1,0.5,0.75,0.75,1,1,0.3333333333333333,0.6666666666666666]];
+				return [[3, 1, 4, 4, 2, 3], [0.3333333333333333, 1, 0.5, 0.75, 1, 1]];
 			}
 		}
 	}
@@ -206,6 +211,12 @@ var initialize_arms_old = function(difficulty) {
 		payoffs: [3,2,2,2,4,4,2,1,3,3]
 		probabilities: [1,1,1,0.5,0.75,0.75,1,1,0.3333333333333333,0.6666666666666666]
 
+	Collab hard (6)
+		[[3, 3, 3, 3, 4, 1], [0.3333333333333333, 1, 0.666666666666666, 0.666666666666666, 0.75, 1]]
+		[[4, 3, 4, 4, 3, 3], [0.25, 0.6666666666666666, 0.75, 0.75, 0.6666666666666666, 0.3333333333333333]]
+		[[4, 4, 3, 3, 3, 4], [0.75, 0.25, 1, 0.6666666666666666, 0.6666666666666666, 0.25]]
+		[[3, 1, 4, 4, 2, 3], [0.3333333333333333, 1, 0.5, 0.75, 1, 1]]
+
 	*/
 	var payoffs_to_sample = [1, 2, 3, 4];
 	var payoffs = [];
@@ -215,8 +226,10 @@ var initialize_arms_old = function(difficulty) {
 		expected_rewards = [1, 2];
 		num_arms = 2;
 	} else if (difficulty == "hard") {
-		expected_rewards = [1, 1, 1, 2, 2, 2, 2, 3, 3, 3];
-		num_arms = 10;
+		// expected_rewards = [1, 1, 1, 2, 2, 2, 2, 3, 3, 3];
+		// num_arms = 10;
+		expected_rewards = [1, 1, 2, 2, 3, 3];
+		num_arms = 6;
 	} else {
 		expected_rewards = [1, 2, 2, 3];
 		num_arms = 4;
@@ -237,6 +250,8 @@ var initialize_arms_old = function(difficulty) {
 		probabilities.push(probability);
 		expected_rewards.splice(idx, 1);
 	}
+	console.log(payoffs);
+	console.log(probabilities);
 	return [payoffs, probabilities];
 }
 var color_arm_values = function(payoffs, probabilities) {
@@ -276,7 +291,7 @@ var in_range = function(x, num_arms) {
 }
 var prompt_arms = function(num_arms) {
 	do {
-	    var selection = prompt("Which arm would you pick? [1-" + String(num_arms) + "]", "");
+	    var selection = prompt("Which arm do you plan to pick next? [1-" + String(num_arms) + "] Note that this will not actually select the arm.", "");
 	} while(selection == null || selection == "" || !in_range(selection, num_arms));
 	human_selection = parseInt(selection);
 	return selection;
@@ -302,7 +317,7 @@ var ask_for_decision = function(num_arms) {
 * insert them into the document.
 *
 ********************/
-
+var initial_time;
 var BetweenConditions = function(next_robot_idx, next_diff_idx, next_robot_args, next_condition) {
 	psiTurk.showPage('between_conditions.html');
 	var num_arms;
@@ -315,7 +330,7 @@ var BetweenConditions = function(next_robot_idx, next_diff_idx, next_robot_args,
 	if (difficulty == "easy") {
 		num_arms = 2;
 	} else if (difficulty == "hard") {
-		num_arms = 10;
+		num_arms = 6;
 	} else if (difficulty == "medium") {
 		num_arms = 4;
 	}
@@ -337,6 +352,8 @@ var BetweenConditions = function(next_robot_idx, next_diff_idx, next_robot_args,
 		document.getElementById("collaborate-instructions").style.display = "block";
 	}
 	next = function() {
+		var d = new Date();
+		initial_time = d.getTime();
 		if (next_condition == "observe"){
 			currentview = new ObserveRobot(next_robot_idx, next_diff_idx, $.extend(true, {}, next_robot_args));
 		} else if (next_condition == "collaborate") {
@@ -443,7 +460,7 @@ var BetweenConditionsCollab = function(next_robot_idx, next_diff_idx, next_colla
 	if (difficulty_order[next_diff_idx] == "easy") {
 		num_arms = 2;
 	} else if (difficulty_order[next_diff_idx] == "hard") {
-		num_arms = 10;
+		num_arms = 6;
 	} else {
 		num_arms = 4;
 	}
@@ -463,7 +480,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
 		num_arms = 2;
 	} else if (difficulty == "hard") {
 		psiTurk.showPage('observe_learning_hard.html');
-		num_arms = 10;
+		num_arms = 6;
 	} else {
 		psiTurk.showPage('observe_learning.html');
 		num_arms = 4;
@@ -640,7 +657,7 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
 		num_arms = 2;
 	} else if (difficulty == "hard") {
 		psiTurk.showPage('multiarm_bandit_hard.html');
-		num_arms = 10;
+		num_arms = 6;
 	} else {
 		psiTurk.showPage('multiarm_bandit.html');
 		num_arms = 4;
@@ -940,7 +957,15 @@ var FinalQuestionnaire = function() {
 	psiTurk.showPage('postquestionnaire.html');
 
 	finish = function() {
+		var green_rank = parseInt(document.getElementById("rank-green").value);
+		var red_rank = parseInt(document.getElementById("rank-red").value);
+		var blue_rank = parseInt(document.getElementById("rank-blue").value);
+		var yellow_rank = parseInt(document.getElementById("rank-yellow").value);
+		var ranks = new Set([green_rank, red_rank, blue_rank, yellow_rank]);
 		if (document.getElementById("age").value == "" || document.getElementById("age").value == null) {
+			return;
+		}
+		if (!(ranks.has(1) && ranks.has(2) && ranks.has(3) && ranks.has(4))) {
 			return;
 		}
 		var gender = document.querySelector('input[name="gender"]:checked').value;
@@ -951,6 +976,8 @@ var FinalQuestionnaire = function() {
 		psiTurk.recordUnstructuredData("robot_colors", robot_colors.slice());
 		psiTurk.recordUnstructuredData("observation_difficulty_order", observation_difficulty_order.slice());
 		psiTurk.recordUnstructuredData("collaborate_difficulty_order", difficulty_order.slice());
+		psiTurk.recordUnstructuredData("robot_ranking_order", ["Green", "Red", "Blue", "Yellow"]);
+		psiTurk.recordUnstructuredData("robot_ranking", [green_rank, red_rank, blue_rank, yellow_rank]);
 		psiTurk.saveData();
 		psiTurk.completeHIT();
 	}
@@ -961,8 +988,16 @@ var Questionnaire = function(prev_robot_idx, next_robot_idx, next_diff_idx, next
 	var robot = robot_colors[prev_robot_idx];
 	document.getElementById('robot-name').innerText = robot;
 	finish = function() {
+		var d = new Date();
+		var final_time = d.getTime();
+		var time_taken = final_time - initial_time;
 		var trust = document.querySelector('input[name="robot-trust"]:checked').value;
+		var useful = document.querySelector('input[name="robot-useful"]:checked').value;
+		var advice = document.querySelector('input[name="robot-advice"]:checked').value;
 		psiTurk.recordUnstructuredData("trust_robot_" + String(robot), trust);
+		psiTurk.recordUnstructuredData("useful_robot_" + String(robot), useful);
+		psiTurk.recordUnstructuredData("advice_robot_" + String(robot), advice);
+		psiTurk.recordUnstructuredData("time_taken_" + String(robot), time_taken);
 		psiTurk.saveData();
 		if (final_robot) {
 			currentview = new FinalQuestionnaire();
@@ -982,6 +1017,8 @@ var currentview;
 $(window).load( function(){
     psiTurk.doInstructions(
     	instructionPages, // a list of pages you want to display in sequence
-    	function() { currentview = new Training(); }
+    	function() { 
+    		currentview = new Training(); 
+    	}
     );
 });

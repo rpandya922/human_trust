@@ -3,7 +3,7 @@
 
     <hr />
 
-    <h2>Please answer the following questions about yourself.</h2>
+    <h2>Please answer the following questions.</h2>
 
     <div class="instructions well">
 
@@ -12,16 +12,17 @@
 
             <!-- beginning of a question -->
             <div class="question">
-                <div class="col-md-12">
-                    <h3>What is your gender?</h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        Gender:
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <form>
                             <label class="radio-inline"><input type="radio" name="gender" value="male">Male</label>
                             <label class="radio-inline"><input type="radio" name="gender" value="female">Female</label>
-                            <label class="radio-inline"><input type="radio" name="gender" value="nonbinary">Nonbinary</label>
-                            <label class="radio-inline"><input type="radio" name="gender" value="other">Other/Prefer not to disclose</label>
+                            <label class="radio-inline"><input type="radio" name="gender" value="other">Other/Prefer not to answer</label>
                       </form>
                     </div>
                 </div>
@@ -31,6 +32,26 @@
             <div class="question">
                 Age:<br>
                 <input type="text" id="age" name="age">
+            </div>
+
+            <div class="question">
+                <div class="row">
+                    <div class="col-md-12">
+                        Rank the robots in terms of how much you liked collaborating with them. Give each robot a different rank. [1: enjoyed most, 4: enjoyed least]:<br>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        Green Robot:<br>
+                        <input type="text" id="rank-green" name="rank-green"><br>
+                        Red Robot:<br>
+                        <input type="text" id="rank-red" name="rank-red"><br>
+                        Blue Robot:<br>
+                        <input type="text" id="rank-blue" name="rank-blue"><br>
+                        Yellow Robot:<br>
+                        <input type="text" id="rank-yellow" name="rank-yellow">
+                    </div>
+                </div>
             </div>
 
         </form>
