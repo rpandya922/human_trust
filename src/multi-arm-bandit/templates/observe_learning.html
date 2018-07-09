@@ -20,55 +20,55 @@
     <div class="trial">
         <div class="row" style="display: flex; justify-content: left;">
             <div class="container">
-                <button id="arm-0-value" class="btn btn-lg disabled">Arm 1</button>
+                <button id="arm-0-value" class="btn btn-lg disabled">Slot 1</button>
                 <div id="arm-0-value-text" class="centered"></div>
             </div>
             <div class="container">
-                <button id="arm-1-value" class="btn btn-lg disabled">Arm 2</button>
+                <button id="arm-1-value" class="btn btn-lg disabled">Slot 2</button>
                 <div id="arm-1-value-text" class="centered"></div>
             </div>
             <div class="container">
-                <button id="arm-2-value" class="btn btn-lg disabled">Arm 3</button>
+                <button id="arm-2-value" class="btn btn-lg disabled">Slot 3</button>
                 <div id="arm-2-value-text" class="centered"></div>
             </div>
             <div class="container">
-                <button id="arm-3-value" class="btn btn-lg disabled">Arm 4</button>
+                <button id="arm-3-value" class="btn btn-lg disabled">Slot 4</button>
                 <div id="arm-3-value-text" class="centered"></div>
             </div>
         </div>
         <div class="row" style="display: flex; justify-content: left;">
             <div class="container">
-                <button type="button" id="arm-0" class="btn btn-secondary btn-lg">Arm 1</button>
+                <button type="button" id="arm-0" class="btn btn-secondary btn-lg">Slot 1</button>
             </div>
             <div class="container">
-                <button type="button" id="arm-1" class="btn btn-secondary btn-lg">Arm 2</button>
+                <button type="button" id="arm-1" class="btn btn-secondary btn-lg">Slot 2</button>
             </div>
             <div class="container">
-                <button type="button" id="arm-2" class="btn btn-secondary btn-lg">Arm 3</button>
+                <button type="button" id="arm-2" class="btn btn-secondary btn-lg">Slot 3</button>
             </div>
             <div class="container">
-                <button type="button" id="arm-3" class="btn btn-secondary btn-lg">Arm 4</button>
+                <button type="button" id="arm-3" class="btn btn-secondary btn-lg">Slot 4</button>
             </div>
         </div>
 
         <div class="row">
             <h1 style="display: inline">Robot: </h1><h1 style="display: inline" id="robot-name"></h1>
             <p></p>
-            <h1 style="display: inline">Iteration: </h1><h1 style="display: inline" id="iteration"></h1>
+            <h1 style="display: inline">Turn: </h1><h1 style="display: inline" id="iteration"></h1>
             <p></p>
-            <h1 style="display: inline">Previous Arm: </h1><h1 style="display: inline" id="previous-arm"></h1>
+            <h1 style="display: inline">Previous Slot: </h1><h1 style="display: inline" id="previous-arm"></h1>
             <p></p>
-            <h1 style="display: inline">Previous Reward: </h1><h1 style="display: inline" id="previous-reward"></h1>
+            <h1 style="display: inline">Previous Payout: </h1><h1 style="display: inline" id="previous-reward"></h1>
             <p></p>
-            <h1 style="display: inline">Total Reward: </h1><h1 style="display: inline" id="reward"></h1>
+            <h1 style="display: inline">Total Payout: </h1><h1 style="display: inline" id="reward"></h1>
         </div>
 
         <div class="row">
             <button type="button" id="next-iteration" class="btn btn-primary btn-lg" onclick="next_iteration()">
                 Next <span class="glyphicon glyphicon-arrow-right"></button>
                     <b>You only need to click the next button to continue!</b>
-            <h2>Colored arms are the robot's next choice. If multiple arms are highlighted, it has no preference.</h2>
-            <h2>These arms are different than those you've seen before.</h2>
+            <h2>Colored slots are the robot's next choice. If multiple slots are highlighted, it has no preference.</h2>
+            <h2>These slots are different than those you've seen before.</h2>
         </div>
     </div>
 </div>
