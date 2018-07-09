@@ -450,21 +450,21 @@ var Training = function() {
                         'all_total_rewards': all_total_rewards, 'all_payoffs': all_payoffs,
                         'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
         psiTurk.recordUnstructuredData(type, all_data);
-        psiTurk.saveData();
-        // psiTurk.saveData({
-        //     success: function() {
-        //         $.ajax({
-        //             dataType: "json",
-        //             url: "/compute_bonus?uniqueId=" + uniqueId,
-        //             success: function(data) {
-        //                 console.log(data);
-        //             },
-        //             error: function(data) {
-        //                 console.log("error updating bonus");
-        //             }
-        //         })
-        //     }
-        // });
+        // psiTurk.saveData();
+        psiTurk.saveData({
+            success: function() {
+                $.ajax({
+                    dataType: "json",
+                    url: "/compute_bonus?uniqueId=" + uniqueId,
+                    success: function(data) {
+                        console.log(data);
+                    },
+                    error: function(data) {
+                        console.log("error updating bonus");
+                    }
+                })
+            }
+        });
 
         document.getElementById('finish').classList.remove("disabled");
         for (var i = 0; i < num_arms; i++) {
