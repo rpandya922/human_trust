@@ -123,7 +123,7 @@ elif args.robot == 'optimal':
         regret.append((n * mu_star) - reward.get())
         total_rewards.append(reward.get())
     for n in range(num_arms, args.pretrain):
-        avg_rewards = [a.average + math.sqrt(2 * math.log(n / a.samples)) for a in arms]
+        avg_rewards = [a.average + math.sqrt(2 * math.log(n) / a.samples) for a in arms]
         i = np.argmax(avg_rewards)
         arm_buttons[i].invoke()
 
