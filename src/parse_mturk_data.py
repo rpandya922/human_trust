@@ -17,6 +17,47 @@ def percent_agreement(human_decisions, robot_decisions):
                 times_agree += 1
             interaction_length += 1
     return times_agree / interaction_length
+def percent_agreement_initial(human_decisions, robot_decisions):
+    times_agree = 0
+    interaction_length = 0
+    for i, human_decision in enumerate(human_decisions):
+        robot_decision = robot_decisions[i]
+        if len(robot_decision) > 1:
+            # robot wanted to explore randomly
+            # ignore this choice, robot essentially withheld a suggestion
+            continue
+        else:
+            # arm numbers are off by one from arm indices
+            if (human_decision - 1) == robot_decision[0]:
+                times_agree += 1
+            interaction_length += 1
+    return times_agree / interaction_length
+def change_mind_to_robot(before_suggest_decisions, human_decisions, robot_decisions):
+    interaction_length = 0
+    times_changed_to_robot = 0
+    times_changed_against_robot = 0
+    times_disagree = 0
+    for i, human_decision in enumerate(human_decisions):
+        before_suggest_decision = before_suggest_decisions[i] - 1
+        robot_decision = robot_decisions[i]
+        if len(robot_decision) > 1:
+            # ignore multiple suggestions
+            continue
+        interaction_length += 1
+        if before_suggest_decision != robot_decision[0]:
+            # initially disagree
+            times_disagree += 1
+            if human_decision == robot_decision[0]:
+                # changed mind to agree with robot
+                times_changed_to_robot += 1
+        else:
+            # initially agree
+            if human_decision != robot_decision[0]:
+                # changed mind to disagree with robot
+                times_changed_against_robot += 1
+    if times_disagree == 0:
+        return None, times_changed_against_robot / interaction_length
+    return times_changed_to_robot / times_disagree, times_changed_against_robot / interaction_length
 def change_mind(before_suggest_decisions, human_decisions, robot_decisions, arm_payoffs=None, arm_probabilities=None):
     # expected_arm_rewards = np.multiply(arm_probabilities, arm_payoffs)
     same_decision = 0
@@ -40,6 +81,27 @@ def change_mind(before_suggest_decisions, human_decisions, robot_decisions, arm_
     if changed_mind == 0:
         return 1 - (same_decision / interaction_length), None
     return 1 - (same_decision / interaction_length), (changed_to_robot / changed_mind)
+def time_until_all_explored(human_decisions, arm_payoffs):
+    num_arms = len(arm_payoffs)
+    explored = set()
+    for i in range(30):
+        explored.add(human_decisions[i])
+        if set(range(num_arms)) <= explored:
+            return i
+    return 30
+def find_epsilon(before_suggest_decisions, average_rewards):
+    times_suboptimal = 0
+    for i, avgs in enumerate(average_rewards):
+        human_decision = before_suggest_decisions[i] - 1
+        if human_decision != np.argmax(avgs):
+            times_suboptimal += 1
+    return times_suboptimal / 30
+def total_reward_in_expectation(human_decisions, arm_payoffs, arm_probabilities):
+    expected_rewards = np.multiply(arm_probabilities, arm_payoffs)
+    total_reward = 0
+    for i in human_decisions:
+        total_reward += expected_rewards[i]
+    return total_reward
 def print_average_rewards():
     # Observe and collaborate condition variables
     # condition number: 0
@@ -266,8 +328,45 @@ collaborate_keys = ['robot_args', 'average_rewards', 'pretrain_decisions', 'befo
                     'all_total_rewards', 'arm_probabilities', 'difficulty', 'total_reward', 'robot_type', 'times_chosen', 
                     'collaboration_type', 'human_decisions', 'robot_decisions', 'pretrain_payoffs', 'all_payoffs']
 csv_headers = ['user id', 'condition', 'robot', 'difficulty', 'trust', 'usefulness', 'advice', 'total_reward', 'percent agreement', 
-              'percent mind changed', 'percent mind channged to robot']
+              'percent mind changed', 'percent mind channged to robot', 'changed mind to robot total', 'percent initial agreement', 
+              'rank', 'iterations_to_explore_all']
 csv_dataset = []
+agree0 = []
+agree1 = []
+
+## observe and collab
+time_until_explored0_greedy = []
+time_until_explored0_optimal = []
+## collab
+time_until_explored1_greedy = []
+time_until_explored1_optimal = []
+
+## observe and collab
+total_expected_reward0_greedy = []
+total_expected_reward0_optimal = []
+# collab
+total_expected_reward1_greedy = []
+total_expected_reward1_optimal = []
+
+## observe and collab
+training_reward0 = []
+## collab
+training_reward1 = []
+
+## observe and colab
+total_rewards0 = []
+## collab
+total_rewards1 = []
+
+avg_epsilon = []
+
+avg_percent_agreement = []
+
+g = []
+g2 = []
+o = []
+r = []
+
 for user in user_data.keys():
     user_dict = user_data[user]
     if set(observe_keys) <= set(user_dict.keys()):
@@ -278,6 +377,14 @@ for user in user_data.keys():
         condition = 'collaborate'
     else:
         continue
+
+    ## person's training data
+    training_dict = ast.literal_eval(user_dict['training'])
+    if condition == 'observe and collaborate':
+        training_reward0.append(training_dict['total_reward'])
+    elif condition == 'collaborate':
+        training_reward1.append(training_dict['total_reward'])
+
     for key in collab_keys:
         collab_dict = ast.literal_eval(user_dict[key])
         robot, difficulty = get_robot_and_difficulty(key)
@@ -302,10 +409,74 @@ for user in user_data.keys():
             continue
         total_reward = collab_dict['total_reward']
         agreement = percent_agreement(collab_dict['human_decisions'], collab_dict['robot_decisions'])
+        initial_agreement = percent_agreement_initial(collab_dict['before_suggest_decisions'], collab_dict['robot_decisions'])
         percent_mind_changed, percent_mind_changed_to_robot = change_mind(collab_dict['before_suggest_decisions'], collab_dict['human_decisions'], collab_dict['robot_decisions'])
-        csv_dataset.append([user, condition, robot, difficulty, trust, usefulness, advice, total_reward, agreement, percent_mind_changed, percent_mind_changed_to_robot])
+        change_to_agree, change_to_disagree = change_mind_to_robot(collab_dict['before_suggest_decisions'], collab_dict['human_decisions'], collab_dict['robot_decisions'])
+        time_until_explored = time_until_all_explored(collab_dict['human_decisions'], collab_dict['arm_payoffs'])
+        epsilon = find_epsilon(collab_dict['before_suggest_decisions'], collab_dict['average_rewards'])
+        
+        rank = None
+        if 'robot_ranking' in user_dict.keys():
+            if robot == 'greedy':
+                rank = ast.literal_eval(user_dict['robot_ranking'])[0]
+                g.append(rank)
+            elif robot == 'greedy2':
+                rank = ast.literal_eval(user_dict['robot_ranking'])[1]
+                g2.append(rank)
+            elif robot == 'optimal':
+                rank = ast.literal_eval(user_dict['robot_ranking'])[2]
+                o.append(rank)
+            elif robot == 'random':
+                rank = ast.literal_eval(user_dict['robot_ranking'])[3]
+                r.append(rank)
+
+        total_expected_reward = total_reward_in_expectation(collab_dict['human_decisions'], collab_dict['arm_payoffs'], collab_dict['arm_probabilities'])
+
+        ## regular total rewards
+        if difficulty == 'easy' and condition == 'observe and collaborate':
+            total_rewards0.append(total_reward)
+        elif difficulty == 'easy' and condition == 'collaborate':
+            total_rewards1.append(total_reward)
+
+        ## total rewards but taken in expectation
+        if robot == 'greedy' and difficulty == 'hard' and condition == 'observe and collaborate':
+            total_expected_reward0_greedy.append(total_expected_reward)
+        elif robot == 'greedy' and difficulty == 'hard' and condition == 'collaborate':
+            total_expected_reward1_greedy.append(total_expected_reward)
+        elif robot == 'optimal' and difficulty == 'hard' and condition == 'observe and collaborate':
+            total_expected_reward0_optimal.append(total_expected_reward)
+        elif robot == 'optimal' and difficulty == 'hard' and condition == 'collaborate':
+            total_expected_reward1_optimal.append(total_expected_reward)
+
+        ## time taken to explore all arms
+        if robot == 'greedy' and difficulty == 'hard' and condition == 'observe and collaborate':
+            time_until_explored0_greedy.append(time_until_explored)
+        elif robot == 'greedy' and difficulty == 'hard' and condition == 'collaborate':
+            time_until_explored1_greedy.append(time_until_explored)
+        elif robot == 'optimal' and difficulty == 'hard' and condition == 'observe and collaborate':
+            time_until_explored0_optimal.append(time_until_explored)
+        elif robot == 'optimal' and difficulty == 'hard' and condition == 'collaborate':
+            time_until_explored1_optimal.append(time_until_explored)
+
+        if percent_mind_changed_to_robot is None:
+            total_mind_changed = 0
+        else:
+            total_mind_changed = percent_mind_changed * percent_mind_changed_to_robot
+        
+        if robot == 'greedy' and change_to_agree is not None:
+            agree0.append(change_to_agree)
+        elif robot == 'optimal' and change_to_agree is not None:
+            agree1.append(change_to_agree)
+        
+        if robot == 'optimal' and difficulty == 'hard':
+            avg_epsilon.append(epsilon)
+            avg_percent_agreement.append(initial_agreement)
+
+        csv_dataset.append([user, condition, robot, difficulty, trust, usefulness, advice, total_reward, agreement, percent_mind_changed, percent_mind_changed_to_robot, 
+            total_mind_changed, initial_agreement, rank, time_until_explored])
+
 ## writing data to csv
-with open('../data/mturk_full_dataset.csv', 'wb') as f:
+with open('../data/mturk_full_dataset3.csv', 'wb') as f:
     wr = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
     headers = [csv_headers]
     for i in range(len(csv_dataset)):

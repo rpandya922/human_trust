@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 from Tkinter import *
 import time
+import abc
 
 class BernoulliArm():
     def __init__(self, p, reward=1, name=-1):
@@ -59,3 +60,47 @@ def click_button(root, button):
     root.update()
     time.sleep(0.5)
     button.invoke()
+
+class LFDModel(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def __init__(self, arms):
+        """Initialize with list of BernoulliArm objects"""
+        self.arms = arms
+
+    @abc.abstractmethod
+    def update(self, reward, arm_idx, average_rewards):
+        """Update current model using reward from chosen arm"""
+        return
+    @abc.abstractmethod
+    def sample(self, arms=None):
+        """Return which arm index to sample from based on current model for the
+           given set of arms (should default to self.arms)"""
+        return
+
+class EpsilonModel(LFDModel):
+    def __init__(self, arms):
+        super(EpsilonModel, self).__init__(arms)
+        self.epsilon = 0
+        self.iterations = 0
+        self.times_suboptimal = 0
+    def update(self, reward, arm_idx, average_rewards):
+        if self.iterations == 0:
+            self.iterations += 1
+            self.epsilon = 0.0
+            return
+        self.iterations += 1
+        best_idx = np.argmax([a.average for a in self.arms])
+        if arm_idx != best_idx:
+            self.times_suboptimal += 1
+        self.epsilon = self.times_suboptimal / self.iterations
+    def sample(self, arms=None):
+        if arms is None:
+            arms = self.arms
+        best_idx = np.argmax([a.average for a in arms])
+        be_greedy = np.random.choice([0, 1], p=[self.epsilon, 1 - self.epsilon])
+        if be_greedy:
+            return best_idx
+        else:
+            return np.random.choice(list(range(len(arms))))
