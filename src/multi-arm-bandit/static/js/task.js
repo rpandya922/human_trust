@@ -43,7 +43,9 @@ var RANDOM_COLOR = 'btn-warning';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // for real study, should be =30
-const NUM_ITERATIONS = 2;
+const NUM_ITERATIONS = 6;
+// delete for real study
+mycondition = 1;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const BAD_COLOR = "#000000";
@@ -77,13 +79,13 @@ function match_shuffle(a, order) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // For debugging/testing, order stays the same: comment out for real study
-var robot_order = ["greedy"];
-var robot_colors = ["Green"];
+var robot_order = ["optimal"];
+var robot_colors = ["Blue"];
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // console.log(robot_order);
 // console.log(robot_colors);
-var difficulty_order = ["easy", "hard"];
+var difficulty_order = ["hard"];
 var observation_difficulty_order = ["medium"];
 var collaboration_order = ["suggest", "turns"];
 var colors_easy = [GOOD_COLOR, BAD_COLOR];
@@ -110,6 +112,16 @@ var argmax = function(arr) {
         }
     }
     return best_idx;
+};
+var all_argmax = function(arr) {
+    var max = Math.max(...arr);
+    var best_idxs = [];
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i] == max) {
+            best_idxs.push(i);
+        }
+    }
+    return best_idxs;
 };
 var highlight_arms = function(arms) {
     for(var i = 0; i < arms.length; i++) {
@@ -305,7 +317,7 @@ var in_range = function(x, num_arms) {
 }
 var prompt_arms = function(num_arms) {
     do {
-        var selection = prompt("Which arm do you plan to pick next? [1-" + String(num_arms) + "] Note that this will not actually select the arm.", "");
+        var selection = prompt("Which slot do you plan to pick next? [1-" + String(num_arms) + "] Note that this will not actually select the slot.", "");
     } while(selection == null || selection == "" || !in_range(selection, num_arms));
     human_selection = parseInt(selection);
     return selection;
@@ -389,6 +401,7 @@ var Training = function() {
     var iteration = 0;
     var arms_disabled = false;
     var previous_arm_chosen;
+    var payoff_history = [...Array(num_arms)].map(e => []);
 
     // data to be saved
     var all_times_chosen = [];
@@ -398,6 +411,7 @@ var Training = function() {
     var all_human_decisions = [];
 
     var recordData = function(arm, payoff) {
+        payoff_history[arm].push(payoff);
         all_times_chosen.push(times_chosen.slice());
         all_average_rewards.push(averages.slice());
         all_total_rewards.push(totalReward);
@@ -437,6 +451,9 @@ var Training = function() {
     }
 
     var update = function() {
+        for (i = 0; i < num_arms; i++) {
+            d3.select("#arm-" + String(i) + "-history").text(payoff_history[i].slice(-4));
+        }
         d3.select("#reward").text(totalReward);
         d3.select("#previous-arm").text(previous_arm_chosen);
         d3.select("#previous-reward").text(prevReward);
@@ -450,21 +467,7 @@ var Training = function() {
                         'all_total_rewards': all_total_rewards, 'all_payoffs': all_payoffs,
                         'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
         psiTurk.recordUnstructuredData(type, all_data);
-        // psiTurk.saveData();
-        psiTurk.saveData({
-            success: function() {
-                $.ajax({
-                    dataType: "json",
-                    url: "/compute_bonus?uniqueId=" + uniqueId,
-                    success: function(data) {
-                        console.log(data);
-                    },
-                    error: function(data) {
-                        console.log("error updating bonus");
-                    }
-                })
-            }
-        });
+        psiTurk.saveData();
 
         document.getElementById('finish').classList.remove("disabled");
         for (var i = 0; i < num_arms; i++) {
@@ -539,6 +542,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     var click_disabled = false;
     var previous_arm_chosen;
     var finish_task = false;
+    
 
     //data to be saved
     var all_times_chosen = [];
@@ -716,6 +720,7 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
     var turn = "robot";
     var previous_arm_chosen;
     var pretrain_averages = [];
+    var payoff_history = [...Array(num_arms)].map(e => []);
 
     //data to be recorded
     var all_times_chosen = [];
@@ -745,13 +750,13 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
                 return [r, _.range(num_arms)];
             }
         } else if (robot_type == "optimal") {
-            if (iteration < num_arms) {
-                // pick each arm once to begin
-                return [iteration, [iteration]];
-            }
+            // if (iteration < num_arms) {
+            //     // pick each arm once to begin
+            //     return [iteration, [iteration]];
+            // }
             var avg_plus_conf = [];
             for (var i = 0; i < num_arms; i++) {
-                avg_plus_conf.push(averages[i] + Math.sqrt(2 * Math.log(iteration) / times_chosen[i]))
+                avg_plus_conf.push(averages[i] + Math.sqrt(2 * Math.log(iteration+2) / times_chosen[i]))
             }
             var r = argmax(avg_plus_conf);
             return [r, [r]];
@@ -759,6 +764,7 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
     };
 
     var recordData = function(arm, payoff) {
+        payoff_history[arm].push(payoff);
         all_times_chosen.push(times_chosen.slice());
         all_average_rewards.push(averages.slice());
         all_total_rewards.push(totalReward);
@@ -867,6 +873,9 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
     };
 
     var update = function() {
+        for (i = 0; i < num_arms; i++) {
+            d3.select("#arm-" + String(i) + "-history").text(payoff_history[i].slice(-4));
+        }
         d3.select("#reward").text(totalReward);
         d3.select("#previous-arm").text(previous_arm_chosen);
         d3.select("#previous-reward").text(prevReward);
@@ -1007,9 +1016,20 @@ var FinalQuestionnaire = function() {
         psiTurk.recordUnstructuredData("collaborate_difficulty_order", difficulty_order.slice());
         psiTurk.recordUnstructuredData("robot_ranking_order", ["Green", "Red", "Blue", "Yellow"]);
         psiTurk.recordUnstructuredData("robot_ranking", [green_rank, red_rank, blue_rank, yellow_rank]);
-        psiTurk.recordUnstructuredData('comments', comments);
+        psiTurk.recordUnstructuredData("comments", comments);
+        psiTurk.recordUnstructuredData("num_iterations", NUM_ITERATIONS);
         psiTurk.saveData({
             success: function() {
+                $.ajax({
+                    dataType: "json",
+                    url: "/compute_bonus?uniqueId=" + uniqueId,
+                    success: function(data) {
+                        console.log(data);
+                    },
+                    error: function(data) {
+                        console.log("error updating bonus");
+                    }
+                });
                 psiTurk.completeHIT();
             }
         });

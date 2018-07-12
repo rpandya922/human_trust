@@ -1,5 +1,5 @@
 # this file imports custom routes into the experiment server
-
+from __future__ import division
 from flask import Blueprint, render_template, request, jsonify, Response, abort, current_app
 from jinja2 import TemplateNotFound
 from functools import wraps
@@ -13,6 +13,10 @@ from psiturk.user_utils import PsiTurkAuthorization, nocache
 from psiturk.db import db_session, init_db
 from psiturk.models import Participant
 from json import dumps, loads
+
+# data parsing
+import ast
+import numpy as np
 
 # load the configuration options
 config = PsiturkConfig()
@@ -82,13 +86,23 @@ def compute_bonus():
                filter(Participant.uniqueid == uniqueId).\
                one()
         user_data = loads(user.datastring) # load datastring from JSON
-        bonus = 7
+        bonus = 0
 
-        for record in user_data['data']: # for line in data file
-            trial = record['trialdata']
-            if trial['phase']=='TEST':
-                if trial['hit']==True:
-                    bonus += 0.02
+        # find actual reward/max expected reward and multiply by max $ amount to give ($1?)
+        # take average over each collaboration setting?
+        questiondata = user_data['questiondata']
+        num_iterations = questiondata['num_iterations']
+        bonuses = []
+        for robot in questiondata['robot_order']:
+            key = str(robot) + "_hard_collaborate_suggest"
+            data_dict = questiondata[key]
+            payoffs = np.array(data_dict['arm_payoffs'])
+            probabilities = np.array(data_dict['arm_probabilities'])
+            max_exp_reward = max(payoffs * probabilities) * num_iterations
+            actual_reward = data_dict['all_total_rewards'][-1]
+            bonuses.append(min(1, 1 * (actual_reward / max_exp_reward)))
+        bonus = np.average(bonuses)
+
         user.bonus = bonus
         db_session.add(user)
         db_session.commit()
@@ -96,7 +110,6 @@ def compute_bonus():
         return jsonify(**resp)
     except Exception as e:
         print "error updating bonus"
-        print user.datastring
         print e
         abort(404)  # again, bad to display HTML, but...
 

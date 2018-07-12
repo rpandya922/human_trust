@@ -1,8 +1,26 @@
+<style>
+.container {
+    position: relative;
+    text-align: center;
+    color: black;
+    margin-right: 0;
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 5em;
+}
+</style>
 <div id="container-exp">
     <div class="trial">
-        <div class="row">
-            <button type="button" id="arm-0" class="btn btn-secondary btn-lg" onclick="clickArm(0)">Slot 1</button>
-            <button type="button" id="arm-1" class="btn btn-secondary btn-lg" onclick="clickArm(1)">Slot 2</button>
+        <div class="row" style="display: flex; justify-content: left;">
+            <div class="container">
+                <button type="button" id="arm-0" class="btn btn-secondary btn-lg" onclick="clickArm(0)">Slot 1</button>
+                <div id="arm-0-history"></div>
+            </div>
+            <div class="container">
+                <button type="button" id="arm-1" class="btn btn-secondary btn-lg" onclick="clickArm(1)">Slot 2</button>
+                <div id="arm-1-history"></div>
+            </div>
         </div>
 
         <div class="row">
