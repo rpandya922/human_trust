@@ -43,7 +43,7 @@ var RANDOM_COLOR = 'btn-warning';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // for real study, should be =30
-const NUM_ITERATIONS = 10;
+const NUM_ITERATIONS = 30;
 // delete for real study
 mycondition = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,8 +79,8 @@ function match_shuffle(a, order) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // For debugging/testing, order stays the same: comment out for real study
-var robot_order = ["optimal", "greedy"];
-var robot_colors = ["Blue", "Green"];
+var robot_order = ["greedy"];
+var robot_colors = ["Green"];
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // console.log(robot_order);
@@ -571,14 +571,14 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     var all_robot_decisions = [];
 
     var chooseNextArm = function() {
+        console.log(times_chosen);
+        console.log(averages);
         if (robot_type == "random" || robot_type == "greedy" || robot_type == "greedy2") {
             var epsilon = robot_args['epsilon'];
             if (Math.random() > epsilon && iteration != 0) {
                 // be greedy, pick argmax
                 var all_best = all_argmax(averages);
                 var choice = all_best[Math.floor(Math.random()*all_best.length)];
-                console.log(all_best);
-                console.log(choice);
                 return [choice, all_best];
             } else {
                 // pick randomly
@@ -632,7 +632,6 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
         next_idx = ret[0];
         to_highlight = ret[1];
         highlight_arms(to_highlight);
-        times_chosen[next_idx] += 1;
         click_disabled = false;
     };
 
@@ -644,7 +643,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
         }
 
         averages[next_idx] = ((averages[next_idx] * times_chosen[next_idx]) + payoff) / (times_chosen[next_idx] + 1)
-
+        times_chosen[next_idx] += 1;
         totalReward += payoff;
         prevReward = payoff;
         recordData(next_idx, payoff);
@@ -690,7 +689,6 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     next_idx = ret[0];
     to_highlight = ret[1];
     highlight_arms(to_highlight);
-    times_chosen[next_idx] += 1;
     updateDisplay();
 };
 
