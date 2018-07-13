@@ -14,6 +14,7 @@ var mycounterbalance = counterbalance;  // they tell you which condition you hav
 // All pages to be loaded
 var pages = [
     "instructions/instruct-1.html",
+    "instructions/instruct-2.html",
     "multiarm_bandit.html",
     "multiarm_bandit_easy.html",
     "multiarm_bandit_hard.html",
@@ -29,6 +30,7 @@ psiTurk.preloadPages(pages);
 
 var instructionPages = [ // add as a list as many pages as you like
     "instructions/instruct-1.html",
+    "instructions/instruct-2.html"
 ];
 
 /********************
@@ -45,7 +47,7 @@ var RANDOM_COLOR = 'btn-warning';
 // for real study, should be =30
 const NUM_ITERATIONS = 30;
 // delete for real study
-mycondition = 0;
+// mycondition = 1;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const BAD_COLOR = "#000000";
@@ -72,15 +74,15 @@ function match_shuffle(a, order) {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Make sure color and order are shuffled the same way: uncomment for real study
-// var robot_shuffle_order = shuffle(_.range(4));
-// var robot_order = match_shuffle(["greedy", "greedy2", "optimal", "random"], robot_shuffle_order);
-// var robot_colors = match_shuffle(["Green", "Red", "Blue", "Yellow"], robot_shuffle_order);
+var robot_shuffle_order = shuffle(_.range(4));
+var robot_order = match_shuffle(["greedy", "greedy2", "optimal", "random"], robot_shuffle_order);
+var robot_colors = match_shuffle(["Green", "Red", "Blue", "Yellow"], robot_shuffle_order);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // For debugging/testing, order stays the same: comment out for real study
-var robot_order = ["greedy"];
-var robot_colors = ["Green"];
+// var robot_order = ["greedy", "greedy2", "optimal", "random"];
+// var robot_colors = ["Green", "Red", "Blue", "Yellow"];
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // console.log(robot_order);
@@ -130,6 +132,10 @@ var all_except_argmax = function(arr) {
         if (arr[i] != max) {
             idxs.push(i);
         }
+    }
+    if (idxs.length == 0) {
+        // means all values were equal to max, so forced to highlight all
+        return _.range(arr.length);
     }
     return idxs;
 };
@@ -388,11 +394,11 @@ var BetweenConditions = function(next_robot_idx, next_diff_idx, next_robot_args,
     var color = robot_colors[next_robot_idx];
     if (next_condition == "observe") {
         $("#message").append("<h2>You will now be <b>observing</b> the <b><em>" + color + " Robot" 
-            + "</em></b> on a task with <b>" + String(num_arms) + "</b> arms.</h2>");
+            + "</em></b> in a casino with <b>" + String(num_arms) + "</b> slots.</h2>");
         document.getElementById("observe-instructions").style.display = "block";
     } else if (next_condition == "collaborate") {
         $("#message").append("<h2>You will now be <b>collaborating</b> with the <b><em>" + color + " Robot" 
-            + "</em></b> on a task with <b>" + String(num_arms) + "</b> arms.</h2>");
+            + "</em></b> in a casino with <b>" + String(num_arms) + "</b> slots.</h2>");
         document.getElementById("collaborate-instructions").style.display = "block";
     }
     next = function() {
@@ -516,7 +522,7 @@ var BetweenConditionsCollab = function(next_robot_idx, next_diff_idx, next_colla
     }
     var color = robot_colors[next_robot_idx];
     $("#message").append("<h2>You will now be <em>collaborating</em> with the <b><em>" + color + " Robot" 
-            + "</em></b> on a task with <b>" + String(num_arms) + "</b> arms.</h2>");
+            + "</em></b> in a casino with <b>" + String(num_arms) + "</b> slots.</h2>");
     next = function() {
         currentview = new Collaborate(next_robot_idx, next_diff_idx, next_collab_idx, next_robot_args);
     }
@@ -571,8 +577,6 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     var all_robot_decisions = [];
 
     var chooseNextArm = function() {
-        console.log(times_chosen);
-        console.log(averages);
         if (robot_type == "random" || robot_type == "greedy" || robot_type == "greedy2") {
             var epsilon = robot_args['epsilon'];
             if (Math.random() > epsilon && iteration != 0) {
@@ -671,11 +675,12 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
                         'average_rewards': all_average_rewards, 'robot_decisions': all_robot_decisions,
                         'all_total_rewards': all_total_rewards, 'all_payoffs': all_payoffs,
                         'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
-        psiTurk.recordUnstructuredData(type, all_data);
-        psiTurk.saveData();
         
         // unhighlight_arms([_.range(num_arms)]);
         document.getElementById('next-iteration').onclick = function() {
+            answer = prompt("How well do you think the robot performed? What strategy was it using to maximize payout?");
+            all_data['answer'] = answer;
+            psiTurk.recordUnstructuredData(type, all_data);
             if (difficulty_idx == observation_difficulty_order.length - 1) {
                 currentview = new BetweenConditions(robot_idx, 0, robot_args, "collaborate");
             } else {
@@ -930,8 +935,8 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
                     'arm_payoffs': payoffs, 'arm_probabilities': probabilities,
                     'pretrain_decisions': all_pretrain_decisions, 'pretrain_payoffs': all_pretrain_rewards,
                     'before_suggest_decisions': all_before_suggest_decisions};
-        psiTurk.recordUnstructuredData(type, all_data);
-        psiTurk.saveData();
+        // psiTurk.recordUnstructuredData(type, all_data);
+        // psiTurk.saveData();
 
         arms_disabled = true;
         document.getElementById('finish').classList.remove("disabled");
@@ -939,6 +944,9 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
             document.getElementById('arm-' + String(i)).classList.add("disabled");
         }
         document.getElementById('finish').onclick = function() {
+            answer = prompt("How well do you think the robot performed? What strategy was it using to maximize payout?");
+            all_data['answer'] = answer;
+            psiTurk.recordUnstructuredData(type, all_data);
             if (difficulty_idx == difficulty_order.length - 1) {
                 if (robot_idx == robot_order.length - 1) {
                     currentview = new Questionnaire(robot_idx, 0, 0, robot_args, "", true);
