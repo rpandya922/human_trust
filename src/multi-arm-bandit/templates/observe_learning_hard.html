@@ -1,28 +1,68 @@
+<style>
+.container {
+    position: relative;
+    text-align: center;
+    color: black;
+    margin-right: 0;
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 5em;
+}
+.centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+</style>
 <div id="container-exp">
     <div class="trial">
-        <div class="row">
-            <button id="arm-0-value" class="btn btn-lg disabled">Slot 1</button>
-            <button id="arm-1-value" class="btn btn-lg disabled">Slot 2</button>
-            <button id="arm-2-value" class="btn btn-lg disabled">Slot 3</button>
-            <button id="arm-3-value" class="btn btn-lg disabled">Slot 4</button>
-            <button id="arm-4-value" class="btn btn-lg disabled">Slot 5</button>
-            <button id="arm-5-value" class="btn btn-lg disabled">Slot 6</button>
-  <!--           <button id="arm-6-value" class="btn btn-lg disabled">Arm 7</button>
-            <button id="arm-7-value" class="btn btn-lg disabled">Arm 8</button>
-            <button id="arm-8-value" class="btn btn-lg disabled">Arm 9</button>
-            <button id="arm-9-value" class="btn btn-lg disabled">Arm 10</button> -->
+        <div class="row" style="display: flex; justify-content: left;">
+            <div class="container">
+                <button id="arm-0-value" class="btn btn-lg disabled">Slot 1</button>
+                <div id="arm-0-value-text" class="centered"></div>
+            </div>
+            <div class="container">
+                <button id="arm-1-value" class="btn btn-lg disabled">Slot 2</button>
+                <div id="arm-1-value-text" class="centered"></div>
+            </div>
+            <div class="container">
+                <button id="arm-2-value" class="btn btn-lg disabled">Slot 3</button>
+                <div id="arm-2-value-text" class="centered"></div>
+            </div>
+            <div class="container">
+                <button id="arm-3-value" class="btn btn-lg disabled">Slot 4</button>
+                <div id="arm-3-value-text" class="centered"></div>
+            </div>
+            <div class="container">
+                <button id="arm-4-value" class="btn btn-lg disabled">Slot 5</button>
+                <div id="arm-4-value-text" class="centered"></div>
+            </div>
+            <div class="container">
+                <button id="arm-5-value" class="btn btn-lg disabled">Slot 6</button>
+                <div id="arm-5-value-text" class="centered"></div>
+            </div>
         </div>
-        <div class="row">
-            <button type="button" id="arm-0" class="btn btn-secondary btn-lg">Slot 1</button>
-            <button type="button" id="arm-1" class="btn btn-secondary btn-lg">Slot 2</button>
-            <button type="button" id="arm-2" class="btn btn-secondary btn-lg">Slot 3</button>
-            <button type="button" id="arm-3" class="btn btn-secondary btn-lg">Slot 4</button>
-            <button type="button" id="arm-4" class="btn btn-secondary btn-lg">Slot 5</button>
-            <button type="button" id="arm-5" class="btn btn-secondary btn-lg">Slot 6</button>
-            <!-- <button type="button" id="arm-6" class="btn btn-secondary btn-lg">Arm 7</button>
-            <button type="button" id="arm-7" class="btn btn-secondary btn-lg">Arm 8</button>
-            <button type="button" id="arm-8" class="btn btn-secondary btn-lg">Arm 9</button>
-            <button type="button" id="arm-9" class="btn btn-secondary btn-lg">Arm 10</button> -->
+        <div class="row" style="display: flex; justify-content: left;">
+            <div class="container">
+                <button type="button" id="arm-0" class="btn btn-secondary btn-lg">Slot 1</button>
+            </div>
+            <div class="container">
+                <button type="button" id="arm-1" class="btn btn-secondary btn-lg">Slot 2</button>
+            </div>
+            <div class="container">
+                <button type="button" id="arm-2" class="btn btn-secondary btn-lg">Slot 3</button>
+            </div>
+            <div class="container">
+                <button type="button" id="arm-3" class="btn btn-secondary btn-lg">Slot 4</button>
+            </div>
+            <div class="container">
+                <button type="button" id="arm-4" class="btn btn-secondary btn-lg">Slot 5</button>
+            </div>
+            <div class="container">
+                <button type="button" id="arm-5" class="btn btn-secondary btn-lg">Slot 6</button>
+            </div>
         </div>
 
         <div class="row">

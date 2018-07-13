@@ -45,7 +45,7 @@ var RANDOM_COLOR = 'btn-warning';
 // for real study, should be =30
 const NUM_ITERATIONS = 6;
 // delete for real study
-mycondition = 1;
+mycondition = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const BAD_COLOR = "#000000";
@@ -79,14 +79,14 @@ function match_shuffle(a, order) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // For debugging/testing, order stays the same: comment out for real study
-var robot_order = ["optimal"];
-var robot_colors = ["Blue"];
+var robot_order = ["optimal", "greedy"];
+var robot_colors = ["Blue", "Green"];
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // console.log(robot_order);
 // console.log(robot_colors);
 var difficulty_order = ["hard"];
-var observation_difficulty_order = ["medium"];
+var observation_difficulty_order = ["hard"];
 var collaboration_order = ["suggest", "turns"];
 var colors_easy = [GOOD_COLOR, BAD_COLOR];
 var colors_worth_easy = ["Good", "Bad"];
@@ -123,6 +123,16 @@ var all_argmax = function(arr) {
     }
     return best_idxs;
 };
+var all_except_argmax = function(arr) {
+    var max = Math.max(...arr);
+    var idxs = [];
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i] != max) {
+            idxs.push(i);
+        }
+    }
+    return idxs;
+};
 var highlight_arms = function(arms) {
     for(var i = 0; i < arms.length; i++) {
         document.getElementById("arm-" + String(arms[i])).classList.remove(DEFAULT_COLOR);
@@ -145,6 +155,8 @@ var initialize_arms = function(difficulty, robot_color, condition) {
         if (condition == "observe") {
             if (difficulty == "medium") {
                 return [[2,3,4,4], [1,1,0.25,0.5]];
+            } else if (difficulty == "hard") {
+                return [[3, 3, 1, 3, 4, 1], [1, 0.6666666666666666, 1, 0.6666666666666666, 0.75, 1]];
             }
         } else if (condition == "collaborate") {
             if (difficulty == "easy") {
@@ -158,6 +170,8 @@ var initialize_arms = function(difficulty, robot_color, condition) {
         if (condition == "observe") {
             if (difficulty == "medium") {
                 return [[3,4,1,2], [1,0.5,1,1]];
+            } else if (difficulty == "hard") {
+                return [[1, 3, 3, 4, 4, 4], [1, 0.6666666666666666, 0.6666666666666666, 0.75, 0.75, 0.25]];
             }
         } else if (condition == "collaborate") {
             if (difficulty == "easy") {
@@ -171,6 +185,8 @@ var initialize_arms = function(difficulty, robot_color, condition) {
         if (condition == "observe") {
             if (difficulty == "medium") {
                 return [[3,3,3,3], [0.6666666666666666,1,0.6666666666666666,0.3333333333333333]];
+            } else if (difficulty == "hard") {
+                return [[3, 4, 3, 3, 2, 4], [0.6666666666666666, 0.75, 0.6666666666666666, 1, 0.5, 0.25]];
             }
         } else if (condition == "collaborate") {
             if (difficulty == "easy") {
@@ -184,6 +200,8 @@ var initialize_arms = function(difficulty, robot_color, condition) {
         if (condition == "observe") {
             if (difficulty == "medium") {
                 return [[3,3,3,2], [0.6666666666666666,1,0.6666666666666666,0.5]];
+            } else if (difficulty == "hard") {
+                return [[2, 3, 2, 1, 2, 3], [1, 1, 0.5, 1, 1, 1]];
             }
         } else if (condition == "collaborate") {
             if (difficulty == "easy") {
@@ -392,12 +410,13 @@ var BetweenConditions = function(next_robot_idx, next_diff_idx, next_robot_args,
 var Training = function() {
     psiTurk.showPage('multiarm_bandit.html');
 
-    var num_arms = 4;
+    var num_arms = 6;
     var totalReward = 0;
     var prevReward = 0;
     var averages = new Array(num_arms).fill(0);
     var times_chosen = new Array(num_arms).fill(0);
-    let [payoffs, probabilities] = [[2,3,4,3], [1,1,0.25,0.6666666666666666]];
+    // let [payoffs, probabilities] = [[2,3,4,3], [1,1,0.25,0.6666666666666666]];
+    let [payoffs, probabilities] = [[2, 1, 3, 2, 3, 3], [1, 1, 1, 0.5, 1, 0.6666666666666666]];
     var iteration = 0;
     var arms_disabled = false;
     var previous_arm_chosen;
@@ -542,7 +561,6 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     var click_disabled = false;
     var previous_arm_chosen;
     var finish_task = false;
-    
 
     //data to be saved
     var all_times_chosen = [];
@@ -556,24 +574,30 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
             var epsilon = robot_args['epsilon'];
             if (Math.random() > epsilon && iteration != 0) {
                 // be greedy, pick argmax
-                var r = argmax(averages);
-                return [r, [r]];
+                var all_best = all_argmax(averages);
+                var choice = all_best[Math.floor(Math.random()*all_best.length)];
+                return [choice, all_best];
             } else {
                 // pick randomly
-                var r = Math.floor(Math.random()*num_arms);
-                return [r, _.range(num_arms)];
+                if (iteration == 0) {
+                    // need to manually highlight all arms on iteration 1 bc initialization issues
+                    var r = Math.floor(Math.random()*num_arms);
+                    return [r, _.range(num_arms)];   
+                } else {
+                    // highlights all except best arm(s)
+                    var all_choices = all_except_argmax(averages);
+                    var choice = all_choices[Math.floor(Math.random()*all_choices.length)];
+                    return [choice, all_choices];
+                }
             }
         } else if (robot_type == "optimal") {
-            if (iteration < num_arms) {
-                // pick each arm once to begin
-                return [iteration, [iteration]];
-            }
             var avg_plus_conf = [];
             for (var i = 0; i < num_arms; i++) {
-                avg_plus_conf.push(averages[i] + Math.sqrt(2 * Math.log(iteration) / times_chosen[i]))
+                avg_plus_conf.push(averages[i] + Math.sqrt(2 * Math.log(iteration+2) / times_chosen[i]))
             }
-            var r = argmax(avg_plus_conf);
-            return [r, [r]];
+            var all_best = all_argmax(avg_plus_conf);
+            var choice = all_best[Math.floor(Math.random()*all_best.length)];
+            return [choice, all_best];
         }
     };
 
@@ -653,23 +677,6 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
             }
         };
         document.getElementById("next-iteration").innerText = "Finish Observing";
-
-        // if (difficulty_idx == difficulty_order.length - 1) {
-        //  currentview = new BetweenConditions(robot_idx, 0, robot_args, "collaborate");
-        // } else {
-        //  currentview = new BetweenConditions(robot_idx, difficulty_idx + 1, robot_args, "observe");
-        // }
-
-        // if (difficulty_idx == difficulty_order.length - 1) {
-        //  if (robot_idx == robot_order.length - 1) {
-        //      currentview = new BetweenConditions(0, 0, robot_args, "collaborate");
-        //  } else {
-        //      currentview = new BetweenConditions(robot_idx + 1, 0, robot_args, "observe");
-        //  }
-        // } else {
-        //  currentview = new BetweenConditions(robot_idx, difficulty_idx + 1, robot_args, "observe");
-        // }
-        // psiTurk.completeHIT();
     };
     color_arm_values(payoffs, probabilities);
     var ret = chooseNextArm();
@@ -734,6 +741,8 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
     var all_pretrain_rewards = [];
 
     var chooseNextArm = function() {
+        // return value [r, [r1, r2,...]] in form [forced selection, all equal arms to highlight]
+
         // if (collaboration_type == "suggest" && iteration >= robot_args['pretrain']) {
         //  r = argmax(pretrain_averages);
         //  return [r, [r]];
@@ -742,24 +751,29 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
             var epsilon = robot_args['epsilon'];
             if (Math.random() > epsilon && iteration != 0) {
                 // be greedy, pick argmax
-                var r = argmax(averages);
-                return [r, [r]];
+                var all_best = all_argmax(averages);
+                var choice = all_best[Math.floor(Math.random()*all_best.length)];
+                return [choice, all_best];
             } else {
                 // pick randomly
-                var r = Math.floor(Math.random()*num_arms);
-                return [r, _.range(num_arms)];
+                if (iteration == 0) {
+                    var r = Math.floor(Math.random()*num_arms);
+                    return [r, _.range(num_arms)];   
+                } else {
+                    // var r = Math.floor(Math.random()*num_arms);
+                    var all_choices = all_except_argmax(averages);
+                    var choice = all_choices[Math.floor(Math.random()*all_choices.length)];
+                    return [choice, all_choices];
+                }
             }
         } else if (robot_type == "optimal") {
-            // if (iteration < num_arms) {
-            //     // pick each arm once to begin
-            //     return [iteration, [iteration]];
-            // }
             var avg_plus_conf = [];
             for (var i = 0; i < num_arms; i++) {
                 avg_plus_conf.push(averages[i] + Math.sqrt(2 * Math.log(iteration+2) / times_chosen[i]))
             }
-            var r = argmax(avg_plus_conf);
-            return [r, [r]];
+            var all_best = all_argmax(avg_plus_conf);
+            var choice = all_best[Math.floor(Math.random()*all_best.length)];
+            return [choice, all_best];
         }
     };
 
@@ -788,7 +802,6 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
     }
 
     clickArm = function(arm_idx, robot_click = false) {
-        // console.log(arms_disabled);
         if (arms_disabled && !robot_click) {
             return;
         }
@@ -800,9 +813,6 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
         if (r < probabilities[arm_idx]) {
             payoff = payoffs[arm_idx];
         }
-
-        // decisions.push(arm_idx);
-        // all_rewards.push(payoff);
 
         averages[arm_idx] = ((averages[arm_idx] * times_chosen[arm_idx]) + payoff) / (times_chosen[arm_idx] + 1)
         times_chosen[arm_idx] += 1
@@ -917,18 +927,7 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
                     'before_suggest_decisions': all_before_suggest_decisions};
         psiTurk.recordUnstructuredData(type, all_data);
         psiTurk.saveData();
-        // psiTurk.recordUnstructuredData('robot_type', robot_type);
-        // psiTurk.recordUnstructuredData('difficulty', difficulty);
-        // psiTurk.recordUnstructuredData('robot_args', robot_args);
-        // psiTurk.recordUnstructuredData('collaboration_type', collaboration_type);
-        // psiTurk.recordUnstructuredData('total_reward_collab', totalReward);
-        // psiTurk.recordUnstructuredData('decisions_collab', decisions);
-        // psiTurk.recordUnstructuredData('times_chosen', all_times_chosen);
-        // psiTurk.recordUnstructuredData('average_rewards', all_average_rewards);
-        // psiTurk.recordUnstructuredData('human_decisions', human_decisions);
-        // psiTurk.recordUnstructuredData('robot_decisions', robot_decisions);
 
-        // unhighlight_arms([_.range(num_arms)]);
         arms_disabled = true;
         document.getElementById('finish').classList.remove("disabled");
         for (var i = 0; i < num_arms; i++) {
@@ -949,28 +948,6 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
                 currentview = new BetweenConditions(robot_idx, difficulty_idx + 1, robot_args, "collaborate");
             }
         };
-
-
-        // if (difficulty_idx == difficulty_order.length - 1) {
-        //  if (robot_idx == robot_order.length - 1) {
-        //      // psiTurk.completeHIT();
-        //      currentview = new Questionnaire();
-        //  } else {
-        //      currentview = new BetweenConditions(robot_idx + 1, 0, robot_args, "observe");
-        //  }
-        // } else {
-        //  currentview = new BetweenConditions(robot_idx, difficulty_idx + 1, robot_args, "collaborate");
-        // }
-
-        // if (difficulty_idx == difficulty_order.length - 1) {
-        //  if (robot_idx == robot_order.length - 1) {
-        //      psiTurk.completeHIT();
-        //  } else {
-        //      currentview = new BetweenConditionsCollab(robot_idx + 1, 0, collaboration_idx, robot_args);
-        //  }
-        // } else {
-        //  currentview = new BetweenConditionsCollab(robot_idx, difficulty_idx + 1, collaboration_idx, robot_args);
-        // }
     };
 
     // Pretrain robot
