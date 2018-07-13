@@ -43,7 +43,7 @@ var RANDOM_COLOR = 'btn-warning';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // for real study, should be =30
-const NUM_ITERATIONS = 6;
+const NUM_ITERATIONS = 10;
 // delete for real study
 mycondition = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -561,6 +561,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     var click_disabled = false;
     var previous_arm_chosen;
     var finish_task = false;
+    var payoff_history = [...Array(num_arms)].map(e => []);
 
     //data to be saved
     var all_times_chosen = [];
@@ -576,6 +577,8 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
                 // be greedy, pick argmax
                 var all_best = all_argmax(averages);
                 var choice = all_best[Math.floor(Math.random()*all_best.length)];
+                console.log(all_best);
+                console.log(choice);
                 return [choice, all_best];
             } else {
                 // pick randomly
@@ -602,6 +605,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     };
 
     var recordData = function(arm, payoff) {
+        payoff_history[arm].push(payoff);
         all_times_chosen.push(times_chosen.slice());
         all_average_rewards.push(averages.slice());
         all_total_rewards.push(totalReward);
@@ -652,6 +656,9 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     };
 
     var updateDisplay = function() {
+        for (i = 0; i < num_arms; i++) {
+            d3.select("#arm-" + String(i) + "-history").text(payoff_history[i].slice(-4));
+        }
         d3.select("#reward").text(totalReward);
         d3.select("#previous-arm").text(previous_arm_chosen);
         d3.select("#previous-reward").text(prevReward);
