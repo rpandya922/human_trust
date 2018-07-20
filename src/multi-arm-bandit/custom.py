@@ -96,9 +96,11 @@ def compute_bonus():
         for robot in questiondata['robot_order']:
             key = str(robot) + "_hard_collaborate_suggest"
             data_dict = questiondata[key]
-            payoffs = np.array(data_dict['arm_payoffs'])
-            probabilities = np.array(data_dict['arm_probabilities'])
-            max_exp_reward = max(payoffs * probabilities) * num_iterations
+            # payoffs = np.array(data_dict['arm_payoffs'])
+            # probabilities = np.array(data_dict['arm_probabilities'])
+            # max_exp_reward = max(payoffs * probabilities) * num_iterations
+            payoff_matrix = np.array(data_dict['arms_payoff_matrix'])
+            max_exp_reward = max(payoff_matrix.dot([0, 1, 2, 3, 4])) * num_iterations
             actual_reward = data_dict['all_total_rewards'][-1]
             bonuses.append(min(1, 1 * (actual_reward / max_exp_reward)))
         bonus = np.average(bonuses)

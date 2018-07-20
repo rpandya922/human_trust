@@ -45,9 +45,9 @@ var RANDOM_COLOR = 'btn-warning';
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // for real study, should be =30
-const NUM_ITERATIONS = 30;
+const NUM_ITERATIONS = 5;
 // delete for real study
-// mycondition = 1;
+// mycondition = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const BAD_COLOR = "#000000";
@@ -103,6 +103,11 @@ var colors_hard = [GOOD_COLOR, GOOD_COLOR, OKAY_COLOR, OKAY_COLOR, BAD_COLOR, BA
 var colors_worth_hard = ["Good", "Good", "Okay", "Okay", "Bad", "Bad"];
 var human_selection;
 
+var casino_names = ["A", ["B", "C"], ["D", "E"], ["F", "G"], ["H", "I"]];
+if (mycondition == 1) {
+    var casino_names = ["A", ["B", "B"], ["C", "C"], ["C", "C"], ["D", "D"]];
+}
+
 var argmax = function(arr) {
     var best = -1;
     var best_idx;
@@ -151,6 +156,91 @@ var unhighlight_arms = function(arms) {
             document.getElementById("arm-" + String(arms[i])).classList.remove(HIGHLIGHT_COLOR);
         } finally {
             document.getElementById("arm-" + String(arms[i])).classList.add(DEFAULT_COLOR);
+        }
+    }
+};
+var initialize_arms_matrix = function(difficulty, robot_color, condition) {
+    // all payoffs and probabilities were randomly generated (with fixed expected rewards across robots)
+    // hard coded because javascript can't seed random numbers
+    if (robot_color == "Green") {
+        if (condition == "observe") {
+            if (difficulty == "hard") {
+                return [[ 0.46875   ,  0.        ,  0.        ,  0.125     ,  0.40625   ],
+                       [ 0.14583333,  0.        ,  0.        ,  0.41666667,  0.4375    ],
+                       [ 0.015625  ,  0.        ,  0.        ,  0.9375    ,  0.046875  ],
+                       [ 0.5625    ,  0.        ,  0.375     ,  0.        ,  0.0625    ],
+                       [ 0.5       ,  0.        ,  0.5       ,  0.        ,  0.        ],
+                       [ 0.27777778,  0.        ,  0.16666667,  0.55555556,  0.        ]];
+            }
+        } else if (condition == "collaborate") {
+            if (difficulty == "hard") {
+                return [[ 0.05555556,  0.41666667,  0.        ,  0.52777778,  0.        ],
+                       [ 0.71875   ,  0.        ,  0.        ,  0.125     ,  0.15625   ],
+                       [ 0.        ,  0.        ,  0.5       ,  0.        ,  0.5       ],
+                       [ 0.109375  ,  0.        ,  0.        ,  0.5625    ,  0.328125  ],
+                       [ 0.41666667,  0.        ,  0.        ,  0.33333333,  0.25      ],
+                       [ 0.1875    ,  0.75      ,  0.        ,  0.        ,  0.0625    ]];
+            }
+        }
+    } else if (robot_color == "Red") {
+        if (condition == "observe") {
+            if (difficulty == "hard") {
+                return [[ 0.25      ,  0.        ,  0.        ,  0.        ,  0.75      ],
+                       [ 0.58333333,  0.        ,  0.25      ,  0.16666667,  0.        ],
+                       [ 0.19444444,  0.        ,  0.41666667,  0.38888889,  0.        ],
+                       [ 0.22222222,  0.66666667,  0.        ,  0.11111111,  0.        ],
+                       [ 0.0625    ,  0.25      ,  0.        ,  0.        ,  0.6875    ],
+                       [ 0.03125   ,  0.625     ,  0.        ,  0.        ,  0.34375   ]];
+            }
+        } else if (condition == "collaborate") {
+            if (difficulty == "hard") {
+                return [[ 0.375     ,  0.        ,  0.        ,  0.5       ,  0.125     ],
+                       [ 0.65625   ,  0.        ,  0.1875    ,  0.        ,  0.15625   ],
+                       [ 0.10416667,  0.        ,  0.        ,  0.58333333,  0.3125    ],
+                       [ 0.0625    ,  0.        ,  0.375     ,  0.        ,  0.5625    ],
+                       [ 0.61111111,  0.08333333,  0.        ,  0.30555556,  0.        ],
+                       [ 0.09375   ,  0.        ,  0.8125    ,  0.        ,  0.09375   ]];
+            }
+        }
+    } else if (robot_color == "Blue") {
+        if (condition == "observe") {
+            if (difficulty == "hard") {
+                return [[ 0.53125   ,  0.        ,  0.4375    ,  0.        ,  0.03125   ],
+                       [ 0.22222222,  0.        ,  0.33333333,  0.44444444,  0.        ],
+                       [ 0.46875   ,  0.375     ,  0.        ,  0.        ,  0.15625   ],
+                       [ 0.25      ,  0.        ,  0.        ,  0.        ,  0.75      ],
+                       [ 0.078125  ,  0.5625    ,  0.        ,  0.        ,  0.359375  ],
+                       [ 0.04166667,  0.        ,  0.        ,  0.83333333,  0.125     ]];
+            }
+        } else if (condition == "collaborate") {
+            if (difficulty == "hard") {
+                return [[ 0.203125  ,  0.0625    ,  0.        ,  0.        ,  0.734375  ],
+                       [ 0.3125    ,  0.25      ,  0.        ,  0.        ,  0.4375    ],
+                       [ 0.58333333,  0.        ,  0.25      ,  0.16666667,  0.        ],
+                       [ 0.03125   ,  0.        ,  0.4375    ,  0.        ,  0.53125   ],
+                       [ 0.08333333,  0.        ,  0.75      ,  0.16666667,  0.        ],
+                       [ 0.63888889,  0.        ,  0.08333333,  0.27777778,  0.        ]];
+            }
+        }
+    } else if (robot_color == "Yellow") {
+        if (condition == "observe") {
+            if (difficulty == "hard") {
+                return [[ 0.0625    ,  0.25      ,  0.        ,  0.        ,  0.6875    ],
+                       [ 0.25      ,  0.        ,  0.        ,  0.        ,  0.75      ],
+                       [ 0.125     ,  0.5       ,  0.        ,  0.        ,  0.375     ],
+                       [ 0.16666667,  0.        ,  0.5       ,  0.33333333,  0.        ],
+                       [ 0.58333333,  0.        ,  0.25      ,  0.16666667,  0.        ],
+                       [ 0.140625  ,  0.8125    ,  0.        ,  0.        ,  0.046875  ]];
+            }
+        } else if (condition == "collaborate") {
+            if (difficulty == "hard") {
+                return [[ 0.3125  ,  0.25    ,  0.      ,  0.      ,  0.4375  ],
+                       [ 0.0625  ,  0.      ,  0.      ,  0.75    ,  0.1875  ],
+                       [ 0.671875,  0.      ,  0.      ,  0.3125  ,  0.015625],
+                       [ 0.03125 ,  0.625   ,  0.      ,  0.      ,  0.34375 ],
+                       [ 0.0625  ,  0.      ,  0.      ,  0.75    ,  0.1875  ],
+                       [ 0.515625,  0.3125  ,  0.      ,  0.      ,  0.171875]];
+            }
         }
     }
 };
@@ -218,7 +308,7 @@ var initialize_arms = function(difficulty, robot_color, condition) {
             }
         }
     }
-}
+};
 var initialize_arms_old = function(difficulty) {
     /*
     Training arms:
@@ -303,7 +393,7 @@ var initialize_arms_old = function(difficulty) {
     console.log(payoffs);
     console.log(probabilities);
     return [payoffs, probabilities];
-}
+};
 var color_arm_values = function(payoffs, probabilities) {
     var num_arms = payoffs.length;
     var colors;
@@ -330,7 +420,40 @@ var color_arm_values = function(payoffs, probabilities) {
         document.getElementById("arm-" + String(arm) + "-value-text").innerText = colors_worth[i];
         expected_rewards[arm] = -1;
     }
-}
+};
+var color_arm_values_matrix = function(payoff_matrix) {
+    var num_arms = payoff_matrix.length;
+    var colors;
+    var colors_worth;
+    if (num_arms == 2) {
+        colors = colors_easy;
+        colors_worth = colors_worth_easy;
+    } else if (num_arms == 4) {
+        colors = colors_medium;
+        colors_worth = colors_worth_medium;
+    } else {
+        colors = colors_hard;
+        colors_worth = colors_worth_hard;
+    }
+    var expected_rewards = [];
+    var possible_payoffs = [0, 1, 2, 3, 4];
+    for (arm_idx = 0; arm_idx < num_arms; arm_idx++) {
+        var probabilities = payoff_matrix[arm_idx];
+        var curr_exp_reward = 0;
+        for (i = 0; i < probabilities.length; i++) {
+            curr_exp_reward += probabilities[i] * possible_payoffs[i];
+        }
+        expected_rewards.push(curr_exp_reward);
+    }
+    for (i = 0; i < num_arms; i++) {
+        arm = argmax(expected_rewards);
+        box = document.getElementById("arm-" + String(arm) + "-value");
+        box.style.color = colors[i];
+        box.style.backgroundColor = colors[i];
+        document.getElementById("arm-" + String(arm) + "-value-text").innerText = colors_worth[i];
+        expected_rewards[arm] = -1;
+    }
+};
 var in_range = function(x, num_arms) {
     for (var i = 1; i <= num_arms; i++) {
         if (parseInt(x) == i) {
@@ -338,14 +461,14 @@ var in_range = function(x, num_arms) {
         }
     }
     return false;
-}
+};
 var prompt_arms = function(num_arms) {
     do {
         var selection = prompt("Which slot do you plan to pick next? [1-" + String(num_arms) + "] Note that this will not actually select the slot.", "");
     } while(selection == null || selection == "" || !in_range(selection, num_arms));
     human_selection = parseInt(selection);
     return selection;
-}
+};
 var ask_for_decision = function(num_arms) {
     for(var i = 0; i < num_arms; i++) {
         try {
@@ -356,7 +479,24 @@ var ask_for_decision = function(num_arms) {
     };
     window.setTimeout(function() {prompt_arms(num_arms)}, 100);
     return;
-}
+};
+var sample_arm = function(probabilities) {
+    // trust that probabilities sum to 1
+    var r = Math.random();
+    var low = 0;
+    var high = probabilities[0];
+    for (i = 0; i < probabilities.length; i++) {
+        if (r >= low && r <= high) {
+            return i;
+        }
+        low += probabilities[i];
+        if (i == probabilities.length - 1) {
+            high = 1;
+        } else {
+            high += probabilities[i+1];
+        }
+    }
+};
 
 /********************
 * HTML manipulation
@@ -422,7 +562,13 @@ var Training = function() {
     var averages = new Array(num_arms).fill(0);
     var times_chosen = new Array(num_arms).fill(0);
     // let [payoffs, probabilities] = [[2,3,4,3], [1,1,0.25,0.6666666666666666]];
-    let [payoffs, probabilities] = [[2, 1, 3, 2, 3, 3], [1, 1, 1, 0.5, 1, 0.6666666666666666]];
+    // let [payoffs, probabilities] = [[2, 1, 3, 2, 3, 3], [1, 1, 1, 0.5, 1, 0.6666666666666666]];
+    var payoff_matrix = [[ 0.140625  ,  0.        ,  0.        ,  0.4375    ,  0.421875  ],
+                         [ 0.27777778,  0.08333333,  0.        ,  0.63888889,  0.        ],
+                         [ 0.015625  ,  0.3125    ,  0.        ,  0.        ,  0.671875  ],
+                         [ 0.0625    ,  0.        ,  0.875     ,  0.        ,  0.0625    ],
+                         [ 0.52777778,  0.        ,  0.41666667,  0.05555556,  0.        ],
+                         [ 0.375     ,  0.25      ,  0.375     ,  0.        ,  0.        ]];
     var iteration = 0;
     var arms_disabled = false;
     var previous_arm_chosen;
@@ -449,11 +595,12 @@ var Training = function() {
             return;
         }
         arms_disabled = true;
-        var r = Math.random();
-        var payoff = 0;
-        if (r < probabilities[arm_idx]) {
-            payoff = payoffs[arm_idx];
-        }
+        var payoff = sample_arm(payoff_matrix[arm_idx]);
+        // var r = Math.random();
+        // var payoff = 0;
+        // if (r < probabilities[arm_idx]) {
+        //     payoff = payoffs[arm_idx];
+        // }
 
         averages[arm_idx] = ((averages[arm_idx] * times_chosen[arm_idx]) + payoff) / (times_chosen[arm_idx] + 1)
         times_chosen[arm_idx] += 1
@@ -490,7 +637,8 @@ var Training = function() {
         var all_data = {'total_reward': totalReward, 'times_chosen': all_times_chosen, 
                         'average_rewards': all_average_rewards, 'human_decisions': all_human_decisions, 
                         'all_total_rewards': all_total_rewards, 'all_payoffs': all_payoffs,
-                        'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
+                        'arms_payoff_matrix': payoff_matrix};
+                        // 'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
         psiTurk.recordUnstructuredData(type, all_data);
         psiTurk.saveData();
 
@@ -555,12 +703,16 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     }
     // console.log(robot_args['epsilon']);
 
+    casino_name = casino_names[(robot_idx+1)][0];
+    d3.select("#casino-name").text("Casino " + casino_name);
+
     // const num_arms = 4;
     var totalReward = 0;
     var prevReward = 0;
     var averages = new Array(num_arms).fill(0);
     var times_chosen = new Array(num_arms).fill(0);
-    let [payoffs, probabilities] = initialize_arms(observation_difficulty_order[difficulty_idx], robot_colors[robot_idx], "observe");
+    // let [payoffs, probabilities] = initialize_arms(observation_difficulty_order[difficulty_idx], robot_colors[robot_idx], "observe");
+    var payoff_matrix = initialize_arms_matrix(observation_difficulty_order[difficulty_idx], robot_colors[robot_idx], "observe");
     var iteration = 0;
     var next_idx;
     var to_highlight;
@@ -579,6 +731,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     var chooseNextArm = function() {
         if (robot_type == "random" || robot_type == "greedy" || robot_type == "greedy2") {
             var epsilon = robot_args['epsilon'];
+            console.log(epsilon);
             if (Math.random() > epsilon && iteration != 0) {
                 // be greedy, pick argmax
                 var all_best = all_argmax(averages);
@@ -640,11 +793,12 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     };
 
     var update = function() {
-        var r = Math.random();
-        var payoff = 0;
-        if (r < probabilities[next_idx]) {
-            payoff = payoffs[next_idx];
-        }
+        // var r = Math.random();
+        // var payoff = 0;
+        // if (r < probabilities[next_idx]) {
+        //     payoff = payoffs[next_idx];
+        // }
+        var payoff = sample_arm(payoff_matrix[next_idx]);
 
         averages[next_idx] = ((averages[next_idx] * times_chosen[next_idx]) + payoff) / (times_chosen[next_idx] + 1)
         times_chosen[next_idx] += 1;
@@ -674,7 +828,8 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
                         'total_reward': totalReward, 'times_chosen': all_times_chosen, 
                         'average_rewards': all_average_rewards, 'robot_decisions': all_robot_decisions,
                         'all_total_rewards': all_total_rewards, 'all_payoffs': all_payoffs,
-                        'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
+                        'arms_payoff_matrix': payoff_matrix};
+                        // 'arm_payoffs': payoffs, 'arm_probabilities': probabilities};
         
         // unhighlight_arms([_.range(num_arms)]);
         document.getElementById('next-iteration').onclick = function() {
@@ -689,7 +844,8 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
         };
         document.getElementById("next-iteration").innerText = "Finish Observing";
     };
-    color_arm_values(payoffs, probabilities);
+    // color_arm_values(payoffs, probabilities);
+    color_arm_values_matrix(payoff_matrix);
     var ret = chooseNextArm();
     next_idx = ret[0];
     to_highlight = ret[1];
@@ -724,11 +880,15 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
         HIGHLIGHT_COLOR = GREEDY2_COLOR;
     }
 
+    casino_name = casino_names[(robot_idx+1)][1];
+    d3.select("#casino-name").text("Casino " + casino_name);
+
     var totalReward = 0;
     var prevReward = 0;
     var averages = new Array(num_arms).fill(0);
     var times_chosen = new Array(num_arms).fill(0);
-    let [payoffs, probabilities] = initialize_arms(difficulty_order[difficulty_idx], robot_colors[robot_idx], "collaborate");
+    // let [payoffs, probabilities] = initialize_arms(difficulty_order[difficulty_idx], robot_colors[robot_idx], "collaborate");
+    var payoff_matrix = initialize_arms_matrix(difficulty_order[difficulty_idx], robot_colors[robot_idx], "collaborate");
     var iteration = 0;
     var next_idx;
     var to_highlight = _.range(num_arms);
@@ -818,11 +978,12 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
         all_before_suggest_decisions.push(human_selection);
         arms_disabled = true;
         unhighlight_arms(to_highlight);
-        var r = Math.random();
-        var payoff = 0;
-        if (r < probabilities[arm_idx]) {
-            payoff = payoffs[arm_idx];
-        }
+        // var r = Math.random();
+        // var payoff = 0;
+        // if (r < probabilities[arm_idx]) {
+        //     payoff = payoffs[arm_idx];
+        // }
+        var payoff = sample_arm(payoff_matrix[arm_idx]);
 
         averages[arm_idx] = ((averages[arm_idx] * times_chosen[arm_idx]) + payoff) / (times_chosen[arm_idx] + 1)
         times_chosen[arm_idx] += 1
@@ -932,7 +1093,8 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
                     'times_chosen': all_times_chosen, 'average_rewards': all_average_rewards, 
                     'human_decisions': all_human_decisions, 'robot_decisions': all_robot_decisions,
                     'all_total_rewards': all_total_rewards, 'all_payoffs': all_payoffs,
-                    'arm_payoffs': payoffs, 'arm_probabilities': probabilities,
+                    'arms_payoff_matrix': payoff_matrix,
+                    // 'arm_payoffs': payoffs, 'arm_probabilities': probabilities,
                     'pretrain_decisions': all_pretrain_decisions, 'pretrain_payoffs': all_pretrain_rewards,
                     'before_suggest_decisions': all_before_suggest_decisions};
         // psiTurk.recordUnstructuredData(type, all_data);
@@ -944,7 +1106,7 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
             document.getElementById('arm-' + String(i)).classList.add("disabled");
         }
         document.getElementById('finish').onclick = function() {
-            answer = prompt("How well do you think the robot performed? What strategy was it using to maximize payout?");
+            answer = prompt("How good do you think the robot's suggestions were? What strategy was it using to maximize payout?");
             all_data['answer'] = answer;
             psiTurk.recordUnstructuredData(type, all_data);
             if (difficulty_idx == difficulty_order.length - 1) {
@@ -1024,7 +1186,7 @@ var FinalQuestionnaire = function() {
             }
         });
     }
-}
+};
 
 var Questionnaire = function(prev_robot_idx, next_robot_idx, next_diff_idx, next_robot_args, next_condition, final_robot = false) {
     psiTurk.showPage('robot_question.html');
@@ -1049,7 +1211,7 @@ var Questionnaire = function(prev_robot_idx, next_robot_idx, next_diff_idx, next
             currentview = new BetweenConditions(next_robot_idx, next_diff_idx, next_robot_args, next_condition);
         }
     }
-}
+};
 
 // Task object to keep track of the current phase
 var currentview;
