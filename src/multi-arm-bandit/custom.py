@@ -105,7 +105,10 @@ def compute_bonus():
             bonuses.append(min(1, 1 * (actual_reward / max_exp_reward)))
         bonus = np.average(bonuses)
 
-        user.bonus = bonus
+        if bonus >= 0.5:
+            user.bonus = bonus
+        else:
+            user.bonus = 0
         db_session.add(user)
         db_session.commit()
         resp = {"bonusComputed": "success"}
