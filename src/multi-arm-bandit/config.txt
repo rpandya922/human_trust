@@ -10,7 +10,7 @@ ad_group = Slot Machine Task
 psiturk_keywords = collaboration
 organization_name = UC Berkeley
 browser_exclude_rule = MSIE, mobile, tablet
-allow_repeats = false
+allow_repeats = true
 
 [Database Parameters]
 database_url = sqlite:///participants.db
