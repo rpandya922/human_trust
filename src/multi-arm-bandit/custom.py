@@ -106,9 +106,9 @@ def compute_bonus():
         bonus = np.average(bonuses)
 
         if bonus >= 0.5:
-            user.bonus = bonus
+            user.bonus = round(bonus, 2)
         else:
-            user.bonus = 0
+            user.bonus = 0.00
         db_session.add(user)
         db_session.commit()
         resp = {"bonusComputed": "success"}
