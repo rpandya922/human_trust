@@ -47,7 +47,7 @@ var RANDOM_COLOR = 'btn-warning';
 // for real study, should be =30
 const NUM_ITERATIONS = 30;
 // delete for real study
-// mycondition = 0;
+mycondition = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const BAD_COLOR = "#000000";
@@ -75,14 +75,14 @@ function match_shuffle(a, order) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Make sure color and order are shuffled the same way: uncomment for real study
 var robot_shuffle_order = shuffle(_.range(4));
-var robot_order = match_shuffle(["greedy", "greedy2", "optimal", "random"], robot_shuffle_order);
+var robot_order = match_shuffle(["greedy", "optimal2", "optimal", "random"], robot_shuffle_order);
 var robot_colors = match_shuffle(["Green", "Red", "Blue", "Yellow"], robot_shuffle_order);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // For debugging/testing, order stays the same: comment out for real study
-// var robot_order = ["greedy", "greedy2", "optimal", "random"];
-// var robot_colors = ["Green", "Red", "Blue", "Yellow"];
+// var robot_order = ["greedy", "optimal", "optimal2", "random"];
+// var robot_colors = ["Green", "Blue", "Red", "Yellow"];
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // console.log(robot_order);
@@ -167,81 +167,89 @@ var initialize_arms_matrix = function(difficulty, robot_color, condition) {
     if (robot_color == "Green") {
         if (condition == "observe") {
             if (difficulty == "hard") {
-                return [[ 0.61111111,  0.        ,  0.16666667,  0.22222222,  0.        ],
-                       [ 0.10416667,  0.        ,  0.        ,  0.08333333,  0.8125    ],
-                       [ 0.5       ,  0.        ,  0.        ,  0.5       ,  0.        ],
-                       [ 0.375     ,  0.25      ,  0.375     ,  0.        ,  0.        ],
-                       [ 0.125     ,  0.25      ,  0.625     ,  0.        ,  0.        ],
-                       [ 0.4375    ,  0.125     ,  0.4375    ,  0.        ,  0.        ]];
+                // [ 1.   1.   1.5  1.5  2.9  1. ]
+                return [[ 0.33333333,  0.5       ,  0.        ,  0.16666667,  0.        ],
+                       [ 0.6875    ,  0.        ,  0.125     ,  0.        ,  0.1875    ],
+                       [ 0.44444444,  0.        ,  0.16666667,  0.38888889,  0.        ],
+                       [ 0.25      ,  0.        ,  0.75      ,  0.        ,  0.        ],
+                       [ 0.18125   ,  0.        ,  0.        ,  0.375     ,  0.44375   ],
+                       [ 0.61111111,  0.08333333,  0.        ,  0.30555556,  0.        ]];
             }
         } else if (condition == "collaborate") {
             if (difficulty == "hard") {
-                return [[ 0.04166667,  0.        ,  0.        ,  0.33333333,  0.625     ],
-                       [ 0.1875    ,  0.75      ,  0.        ,  0.        ,  0.0625    ],
-                       [ 0.234375  ,  0.6875    ,  0.        ,  0.        ,  0.078125  ],
-                       [ 0.52083333,  0.        ,  0.        ,  0.41666667,  0.0625    ],
-                       [ 0.27777778,  0.        ,  0.66666667,  0.05555556,  0.        ],
-                       [ 0.63888889,  0.        ,  0.08333333,  0.27777778,  0.        ]];
+                // [ 1.5  1.   1.5  1.   2.9  1. ]
+                return [[ 0.625     ,  0.        ,  0.        ,  0.        ,  0.375     ],
+                       [ 0.6875    ,  0.        ,  0.        ,  0.25      ,  0.0625    ],
+                       [ 0.58333333,  0.        ,  0.        ,  0.16666667,  0.25      ],
+                       [ 0.59375   ,  0.        ,  0.3125    ,  0.        ,  0.09375   ],
+                       [ 0.1375    ,  0.        ,  0.        ,  0.55      ,  0.3125    ],
+                       [ 0.05555556,  0.91666667,  0.        ,  0.02777778,  0.        ]];
             }
         }
     } else if (robot_color == "Red") {
         if (condition == "observe") {
             if (difficulty == "hard") {
-                return [[ 0.66666667,  0.        ,  0.        ,  0.33333333,  0.        ],
-                       [ 0.125     ,  0.25      ,  0.625     ,  0.        ,  0.        ],
-                       [ 0.078125  ,  0.        ,  0.        ,  0.1875    ,  0.734375  ],
-                       [ 0.6875    ,  0.        ,  0.        ,  0.25      ,  0.0625    ],
-                       [ 0.671875  ,  0.        ,  0.        ,  0.3125    ,  0.015625  ],
-                       [ 0.38888889,  0.        ,  0.33333333,  0.27777778,  0.        ]];
+                // [ 1.5  1.5  1.   1.   1.   2.9]
+                return [[ 0.        ,  0.5       ,  0.5       ,  0.        ,  0.        ],
+                       [ 0.515625  ,  0.        ,  0.        ,  0.4375    ,  0.046875  ],
+                       [ 0.66666667,  0.        ,  0.        ,  0.33333333,  0.        ],
+                       [ 0.421875  ,  0.4375    ,  0.        ,  0.        ,  0.140625  ],
+                       [ 0.5       ,  0.25      ,  0.        ,  0.25      ,  0.        ],
+                       [ 0.1375    ,  0.        ,  0.        ,  0.55      ,  0.3125    ]];
             }
         } else if (condition == "collaborate") {
             if (difficulty == "hard") {
-                return [[ 0.015625  ,  0.        ,  0.        ,  0.4375    ,  0.546875  ],
-                       [ 0.5       ,  0.        ,  0.25      ,  0.        ,  0.25      ],
-                       [ 0.61111111,  0.08333333,  0.        ,  0.30555556,  0.        ],
-                       [ 0.0625    ,  0.875     ,  0.0625    ,  0.        ,  0.        ],
-                       [ 0.6875    ,  0.        ,  0.125     ,  0.        ,  0.1875    ],
-                       [ 0.41666667,  0.        ,  0.25      ,  0.33333333,  0.        ]];
+                // [ 1.5  1.   2.9  1.   1.5  1. ]
+                return [[ 0.5       ,  0.        ,  0.25      ,  0.        ,  0.25      ],
+                       [ 0.05555556,  0.91666667,  0.        ,  0.02777778,  0.        ],
+                       [ 0.15      ,  0.        ,  0.        ,  0.5       ,  0.35      ],
+                       [ 0.72916667,  0.        ,  0.        ,  0.08333333,  0.1875    ],
+                       [ 0.        ,  0.5       ,  0.5       ,  0.        ,  0.        ],
+                       [ 0.58333333,  0.        ,  0.25      ,  0.16666667,  0.        ]];
             }
         }
     } else if (robot_color == "Blue") {
         if (condition == "observe") {
             if (difficulty == "hard") {
-                return [[ 0.5625  ,  0.      ,  0.375   ,  0.      ,  0.0625  ],
-                       [ 0.5     ,  0.      ,  0.5     ,  0.      ,  0.      ],
-                       [ 0.5     ,  0.      ,  0.25    ,  0.      ,  0.25    ],
-                       [ 0.4375  ,  0.25    ,  0.      ,  0.      ,  0.3125  ],
-                       [ 0.515625,  0.3125  ,  0.      ,  0.      ,  0.171875],
-                       [ 0.0625  ,  0.      ,  0.125   ,  0.      ,  0.8125  ]];
+                // [ 1.5  1.5  1.   1.   2.9  1. ]
+                return [[ 0.125     ,  0.25      ,  0.625     ,  0.        ,  0.        ],
+                       [ 0.27777778,  0.        ,  0.66666667,  0.05555556,  0.        ],
+                       [ 0.55555556,  0.16666667,  0.        ,  0.27777778,  0.        ],
+                       [ 0.11111111,  0.83333333,  0.        ,  0.05555556,  0.        ],
+                       [ 0.17916667,  0.        ,  0.        ,  0.38333333,  0.4375    ],
+                       [ 0.625     ,  0.        ,  0.125     ,  0.25      ,  0.        ]];
             }
         } else if (condition == "collaborate") {
             if (difficulty == "hard") {
-                return [[ 0.53125,  0.125  ,  0.     ,  0.     ,  0.34375],
-                       [ 0.125  ,  0.     ,  0.     ,  0.     ,  0.875  ],
-                       [ 0.75   ,  0.     ,  0.     ,  0.     ,  0.25   ],
-                       [ 0.25   ,  0.5    ,  0.25   ,  0.     ,  0.     ],
-                       [ 0.375  ,  0.     ,  0.375  ,  0.25   ,  0.     ],
-                       [ 0.5    ,  0.     ,  0.5    ,  0.     ,  0.     ]];
+                // [ 2.9  1.   1.   1.   1.5  1.5]
+                return [[ 0.24375   ,  0.        ,  0.        ,  0.125     ,  0.63125   ],
+                       [ 0.125     ,  0.75      ,  0.125     ,  0.        ,  0.        ],
+                       [ 0.52777778,  0.        ,  0.41666667,  0.05555556,  0.        ],
+                       [ 0.25      ,  0.5       ,  0.25      ,  0.        ,  0.        ],
+                       [ 0.47222222,  0.        ,  0.08333333,  0.44444444,  0.        ],
+                       [ 0.578125  ,  0.0625    ,  0.        ,  0.        ,  0.359375  ]];
             }
         }
     } else if (robot_color == "Yellow") {
         if (condition == "observe") {
             if (difficulty == "hard") {
-                return [[ 0.27777778,  0.        ,  0.66666667,  0.05555556,  0.        ],
-                       [ 0.04166667,  0.        ,  0.        ,  0.33333333,  0.625     ],
-                       [ 0.38888889,  0.41666667,  0.        ,  0.19444444,  0.        ],
-                       [ 0.25      ,  0.5       ,  0.        ,  0.        ,  0.25      ],
-                       [ 0.609375  ,  0.1875    ,  0.        ,  0.        ,  0.203125  ],
-                       [ 0.61111111,  0.        ,  0.16666667,  0.22222222,  0.        ]];
+                // [ 1.   1.   1.   1.5  2.9  1.5]
+                return [[ 0.25      ,  0.5       ,  0.25      ,  0.        ,  0.        ],
+                       [ 0.33333333,  0.5       ,  0.        ,  0.16666667,  0.        ],
+                       [ 0.375     ,  0.5       ,  0.        ,  0.        ,  0.125     ],
+                       [ 0.125     ,  0.25      ,  0.625     ,  0.        ,  0.        ],
+                       [ 0.00555556,  0.        ,  0.08333333,  0.91111111,  0.        ],
+                       [ 0.41666667,  0.        ,  0.25      ,  0.33333333,  0.        ]];
             }
         } else if (condition == "collaborate") {
             if (difficulty == "hard") {
-                return [[ 0.046875  ,  0.        ,  0.        ,  0.3125    ,  0.640625  ],
-                       [ 0.53125   ,  0.        ,  0.1875    ,  0.        ,  0.28125   ],
-                       [ 0.41666667,  0.        ,  0.25      ,  0.33333333,  0.        ],
-                       [ 0.4375    ,  0.125     ,  0.4375    ,  0.        ,  0.        ],
-                       [ 0.328125  ,  0.5625    ,  0.        ,  0.        ,  0.109375  ],
-                       [ 0.3125    ,  0.375     ,  0.3125    ,  0.        ,  0.        ]];
+                // [ 1.   1.   1.5  2.9  1.   1.5]
+                return [[ 0.625     ,  0.        ,  0.125     ,  0.25      ,  0.        ],
+                       [ 0.125     ,  0.75      ,  0.125     ,  0.        ,  0.        ],
+                       [ 0.29166667,  0.        ,  0.625     ,  0.08333333,  0.        ],
+                       [ 0.2125    ,  0.        ,  0.125     ,  0.        ,  0.6625    ],
+                       [ 0.61111111,  0.        ,  0.16666667,  0.22222222,  0.        ],
+                       [ 0.53125   ,  0.125     ,  0.        ,  0.        ,  0.34375   ]];
             }
         }
     }
@@ -563,12 +571,12 @@ var Training = function() {
     var prevReward = 0;
     var averages = new Array(num_arms).fill(0);
     var times_chosen = new Array(num_arms).fill(0);
-    var payoff_matrix = [[ 0.0625    ,  0.        ,  0.        ,  0.25      ,  0.6875    ],
-                         [ 0.0625    ,  0.375     ,  0.5625    ,  0.        ,  0.        ],
-                         [ 0.6875    ,  0.        ,  0.        ,  0.25      ,  0.0625    ],
-                         [ 0.0625    ,  0.875     ,  0.0625    ,  0.        ,  0.        ],
-                         [ 0.33333333,  0.25      ,  0.        ,  0.41666667,  0.        ],
-                         [ 0.05555556,  0.91666667,  0.        ,  0.02777778,  0.        ]];
+    var payoff_matrix = [[ 0.2375  ,  0.      ,  0.075   ,  0.      ,  0.6875  ],
+                       [ 0.4375  ,  0.125   ,  0.4375  ,  0.      ,  0.      ],
+                       [ 0.4375  ,  0.      ,  0.375   ,  0.      ,  0.1875  ],
+                       [ 0.75    ,  0.      ,  0.      ,  0.      ,  0.25    ],
+                       [ 0.53125 ,  0.      ,  0.4375  ,  0.      ,  0.03125 ],
+                       [ 0.484375,  0.1875  ,  0.      ,  0.      ,  0.328125]];
     var iteration = 0;
     var arms_disabled = false;
     var previous_arm_chosen;
@@ -694,6 +702,8 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
         HIGHLIGHT_COLOR = GREEDY_COLOR;
     } else if (robot_type == "greedy2") {
         HIGHLIGHT_COLOR = GREEDY2_COLOR;
+    } else if (robot_type == "optimal2") {
+        HIGHLIGHT_COLOR = GREEDY2_COLOR;
     }
 
     casino_name = casino_names[(robot_idx+1)][0];
@@ -711,6 +721,7 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     var previous_arm_chosen;
     var finish_task = false;
     var payoff_history = [...Array(num_arms)].map(e => []);
+    var gamma = 1; // exploration paramater for modified UCB
 
     //data to be saved
     var all_times_chosen = [];
@@ -746,6 +757,15 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
             for (var i = 0; i < num_arms; i++) {
                 avg_plus_conf.push(averages[i] + Math.sqrt(2 * Math.log(iteration+2) / times_chosen[i]))
             }
+            var all_best = all_argmax(avg_plus_conf);
+            var choice = all_best[Math.floor(Math.random()*all_best.length)];
+            return [choice, all_best];
+        } else if (robot_type == "optimal2") {
+            var avg_plus_conf = [];
+            for (var i = 0; i < num_arms; i++) {
+                avg_plus_conf.push(averages[i] + gamma * Math.sqrt(2 * Math.log(iteration+2) / times_chosen[i]))
+            }
+            gamma = gamma - (1 / 29);
             var all_best = all_argmax(avg_plus_conf);
             var choice = all_best[Math.floor(Math.random()*all_best.length)];
             return [choice, all_best];
@@ -863,6 +883,8 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
         HIGHLIGHT_COLOR = GREEDY_COLOR;
     } else if (robot_type == "greedy2") {
         HIGHLIGHT_COLOR = GREEDY2_COLOR;
+    } else if (robot_type == "optimal2") {
+        HIGHLIGHT_COLOR = GREEDY2_COLOR;
     }
 
     casino_name = casino_names[(robot_idx+1)][1];
@@ -882,6 +904,7 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
     var previous_arm_chosen;
     var pretrain_averages = [];
     var payoff_history = [...Array(num_arms)].map(e => []);
+    var gamma = 1; // exploration parameter for modified UCB
 
     //data to be recorded
     var all_times_chosen = [];
@@ -925,6 +948,15 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
             for (var i = 0; i < num_arms; i++) {
                 avg_plus_conf.push(averages[i] + Math.sqrt(2 * Math.log(iteration+2) / times_chosen[i]))
             }
+            var all_best = all_argmax(avg_plus_conf);
+            var choice = all_best[Math.floor(Math.random()*all_best.length)];
+            return [choice, all_best];
+        } else if (robot_type == "optimal2") {
+            var avg_plus_conf = [];
+            for (var i = 0; i < num_arms; i++) {
+                avg_plus_conf.push(averages[i] + gamma * Math.sqrt(2 * Math.log(iteration+2) / times_chosen[i]))
+            }
+            gamma = gamma - (1 / 29);
             var all_best = all_argmax(avg_plus_conf);
             var choice = all_best[Math.floor(Math.random()*all_best.length)];
             return [choice, all_best];
