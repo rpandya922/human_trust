@@ -4,7 +4,7 @@ from random import shuffle
 
 num_arms = 6
 possible_payoffs = list(range(1, 5))
-expected_reward_values = [1, 1, 2, 2, 3, 3]
+expected_reward_values = [1, 1, 1, 1.5, 1.5, 2.9]
 shuffle(expected_reward_values)
 print expected_reward_values
 
@@ -37,3 +37,4 @@ for reward in expected_reward_values:
 # to sample, use row as weights for sampling from 0-4
 # to find expected reward, take row dot [0 1 2 3 4]
 print repr(np.array(payoff_matrix))
+print np.dot(payoff_matrix, [0, 1, 2, 3, 4])
