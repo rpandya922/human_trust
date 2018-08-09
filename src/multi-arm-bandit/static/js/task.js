@@ -47,7 +47,7 @@ var RANDOM_COLOR = 'btn-warning';
 // for real study, should be =30
 const NUM_ITERATIONS = 30;
 // delete for real study
-mycondition = 0;
+// mycondition = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const BAD_COLOR = "#000000";
