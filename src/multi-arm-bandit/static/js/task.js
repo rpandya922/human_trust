@@ -9,6 +9,7 @@ var psiTurk = new PsiTurk(uniqueId, adServerLoc, mode);
 
 var mycondition = condition;  // these two variables are passed by the psiturk server process
 var mycounterbalance = counterbalance;  // they tell you which condition you have been assigned to
+var stats; // determines what statistics to show the person; 0: none, 1: avg + std dev, 2: previous 4
 // they are not used in the stroop code but may be useful to you
 // console.log(mycondition);
 // All pages to be loaded
@@ -46,6 +47,21 @@ var RANDOM_COLOR = 'btn-warning';
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // for real study, should be =30
 const NUM_ITERATIONS = 30;
+const EXPERIMENT_TYPE = "stats";
+// const EXPERIMENT_TYPE = "observe";
+if (EXPERIMENT_TYPE == "stats") {
+    // set stats variable to condition passed in
+    stats = condition;
+
+    // put code into only-collaborate mode
+    mycondition = 1;
+} else if (EXPERIMENT_TYPE == "observe") {
+    // put code into showing-previous-4 mode   
+    stats = 2;
+    
+    // set condition to passed in condition
+    mycondition = condition;
+}
 // delete for real study
 // mycondition = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +126,23 @@ if (mycondition == 1) {
     var casino_names = ["A", ["B", "B"], ["C", "C"], ["C", "C"], ["D", "D"]];
 }
 
+var stddev = function(arr) {
+    if (arr.length == 0) {
+        return 0;
+    }
+    var total = 0;
+    for(var key in arr) 
+       total += arr[key];
+    var meanVal = total / arr.length;
+  
+    //--CALCULATE STANDARD DEVIATION--
+    var SDprep = 0;
+    for(var key in arr) 
+       SDprep += Math.pow((parseFloat(arr[key]) - meanVal),2);
+    var SDresult = Math.sqrt(SDprep/arr.length);
+    //--CALCULATE STANDARD DEVIATION--
+    return SDresult;
+}
 var argmax = function(arr) {
     var best = -1;
     var best_idx;
@@ -566,6 +599,13 @@ var BetweenConditions = function(next_robot_idx, next_diff_idx, next_robot_args,
 var Training = function() {
     psiTurk.showPage('multiarm_bandit.html');
 
+    if (stats == 0 || stats == 1) {
+        document.getElementById("prev-reward-text").style.display = "inline";
+        document.getElementById("previous-reward").style.display = "inline";
+        document.getElementById("prev-arm-text").style.display = "inline";
+        document.getElementById("previous-arm").style.display = "inline";
+    }
+
     var num_arms = 6;
     var totalReward = 0;
     var prevReward = 0;
@@ -626,8 +666,17 @@ var Training = function() {
     }
 
     var update = function() {
-        for (i = 0; i < num_arms; i++) {
-            d3.select("#arm-" + String(i) + "-history").text(payoff_history[i].slice(-4));
+        if (stats == 1) {
+            for (i = 0; i < num_arms; i++) {
+                average = parseFloat(averages[i]).toFixed(1);
+                standard_dev = parseFloat(stddev(payoff_history[i])).toFixed(1);
+                disp = String(average) + "±" + String(standard_dev)
+                d3.select("#arm-" + String(i) + "-history").text(disp);
+            }
+        } else if (stats == 2) {
+            for (i = 0; i < num_arms; i++) {
+                d3.select("#arm-" + String(i) + "-history").text(payoff_history[i].slice(-4));
+            }
         }
         d3.select("#reward").text(totalReward);
         d3.select("#previous-arm").text(previous_arm_chosen);
@@ -691,6 +740,14 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
         psiTurk.showPage('observe_learning.html');
         num_arms = 4;
     }
+
+    if (stats == 0 || stats == 1) {
+        document.getElementById("prev-reward-text").style.display = "inline";
+        document.getElementById("previous-reward").style.display = "inline";
+        document.getElementById("prev-arm-text").style.display = "inline";
+        document.getElementById("previous-arm").style.display = "inline";
+    }
+
     d3.select("#robot-name").text(robot_colors[robot_idx]);
 
     var robot_type = robot_order[robot_idx];
@@ -819,8 +876,17 @@ var ObserveRobot = function(robot_idx, difficulty_idx, robot_args) {
     };
 
     var updateDisplay = function() {
-        for (i = 0; i < num_arms; i++) {
-            d3.select("#arm-" + String(i) + "-history").text(payoff_history[i].slice(-4));
+        if (stats == 1) {
+            for (i = 0; i < num_arms; i++) {
+                average = parseFloat(averages[i]).toFixed(1);
+                standard_dev = parseFloat(stddev(payoff_history[i])).toFixed(1);
+                disp = String(average) + "±" + String(standard_dev)
+                d3.select("#arm-" + String(i) + "-history").text(disp);
+            }
+        } else if (stats == 2) {
+            for (i = 0; i < num_arms; i++) {
+                d3.select("#arm-" + String(i) + "-history").text(payoff_history[i].slice(-4));
+            }
         }
         d3.select("#reward").text(totalReward);
         d3.select("#previous-arm").text(previous_arm_chosen);
@@ -872,6 +938,14 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
         psiTurk.showPage('multiarm_bandit.html');
         num_arms = 4;
     }
+
+    if (stats == 0 || stats == 1) {
+        document.getElementById("prev-reward-text").style.display = "inline";
+        document.getElementById("previous-reward").style.display = "inline";
+        document.getElementById("prev-arm-text").style.display = "inline";
+        document.getElementById("previous-arm").style.display = "inline";
+    }
+
     d3.select("#robot-name").text(robot_colors[robot_idx]);
 
     var robot_type = robot_order[robot_idx];
@@ -1061,8 +1135,17 @@ var Collaborate = function(robot_idx, difficulty_idx, collaboration_idx, robot_a
     };
 
     var update = function() {
-        for (i = 0; i < num_arms; i++) {
-            d3.select("#arm-" + String(i) + "-history").text(payoff_history[i].slice(-4));
+        if (stats == 1) {
+            for (i = 0; i < num_arms; i++) {
+                average = parseFloat(averages[i]).toFixed(1);
+                standard_dev = parseFloat(stddev(payoff_history[i])).toFixed(1);
+                disp = String(average) + "±" + String(standard_dev)
+                d3.select("#arm-" + String(i) + "-history").text(disp);
+            }
+        } else if (stats == 2) {
+            for (i = 0; i < num_arms; i++) {
+                d3.select("#arm-" + String(i) + "-history").text(payoff_history[i].slice(-4));
+            }
         }
         d3.select("#reward").text(totalReward);
         d3.select("#previous-arm").text(previous_arm_chosen);
@@ -1214,6 +1297,7 @@ var Questionnaire = function(prev_robot_idx, next_robot_idx, next_diff_idx, next
         psiTurk.recordUnstructuredData("useful_robot_" + String(robot), useful);
         psiTurk.recordUnstructuredData("advice_robot_" + String(robot), advice);
         psiTurk.recordUnstructuredData("time_taken_" + String(robot), time_taken);
+        psiTurk.recordUnstructuredData("condition", mycondition);
         psiTurk.saveData();
         if (final_robot) {
             currentview = new FinalQuestionnaire();
