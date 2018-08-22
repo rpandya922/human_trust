@@ -13,9 +13,33 @@ var stats; // determines what statistics to show the person; 0: none, 1: avg + s
 // they are not used in the stroop code but may be useful to you
 // console.log(mycondition);
 // All pages to be loaded
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+// for real study, should be =30
+const NUM_ITERATIONS = 30;
+const EXPERIMENT_TYPE = "stats";
+// const EXPERIMENT_TYPE = "observe";
+if (EXPERIMENT_TYPE == "stats") {
+    // set stats variable to condition passed in
+    stats = condition;
+
+    // put code into only-collaborate mode
+    mycondition = 1;
+} else if (EXPERIMENT_TYPE == "observe") {
+    // put code into showing-previous-4 mode   
+    stats = 2;
+
+    // set condition to passed in condition
+    mycondition = condition;
+}
+// delete for real study
+// mycondition = 0;
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 var pages = [
     "instructions/instruct-1.html",
     "instructions/instruct-2.html",
+    "instructions/instruct-3.html",
     "multiarm_bandit.html",
     "multiarm_bandit_easy.html",
     "multiarm_bandit_hard.html",
@@ -34,6 +58,14 @@ var instructionPages = [ // add as a list as many pages as you like
     "instructions/instruct-2.html"
 ];
 
+if (EXPERIMENT_TYPE == "stats" && stats == 1) {
+    instructionPages = [
+        "instructions/instruct-1.html",
+        "instructions/instruct-3.html",  
+        "instructions/instruct-2.html"  
+    ];
+}
+
 /********************
 * Constants
 *********************/
@@ -43,28 +75,6 @@ var GREEDY_COLOR = 'btn-success';
 var GREEDY2_COLOR = 'btn-danger';
 var OPTIMAL_COLOR = 'btn-primary';
 var RANDOM_COLOR = 'btn-warning';
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-// for real study, should be =30
-const NUM_ITERATIONS = 30;
-const EXPERIMENT_TYPE = "stats";
-// const EXPERIMENT_TYPE = "observe";
-if (EXPERIMENT_TYPE == "stats") {
-    // set stats variable to condition passed in
-    stats = condition;
-
-    // put code into only-collaborate mode
-    mycondition = 1;
-} else if (EXPERIMENT_TYPE == "observe") {
-    // put code into showing-previous-4 mode   
-    stats = 2;
-    
-    // set condition to passed in condition
-    mycondition = condition;
-}
-// delete for real study
-// mycondition = 0;
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const BAD_COLOR = "#000000";
 const OKAY_COLOR = "#6C6C6C";
@@ -1297,7 +1307,11 @@ var Questionnaire = function(prev_robot_idx, next_robot_idx, next_diff_idx, next
         psiTurk.recordUnstructuredData("useful_robot_" + String(robot), useful);
         psiTurk.recordUnstructuredData("advice_robot_" + String(robot), advice);
         psiTurk.recordUnstructuredData("time_taken_" + String(robot), time_taken);
-        psiTurk.recordUnstructuredData("condition", mycondition);
+        if (EXPERIMENT_TYPE == "stats") {
+            psiTurk.recordUnstructuredData("condition", stats);
+        } else if (EXPERIMENT_TYPE == "observe") {
+            psiTurk.recordUnstructuredData("condition", mycondition);
+        }
         psiTurk.saveData();
         if (final_robot) {
             currentview = new FinalQuestionnaire();
