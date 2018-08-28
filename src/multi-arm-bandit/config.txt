@@ -1,5 +1,5 @@
 [HIT Configuration]
-title = Slot Machines (15 minutes)
+title = Slot Machines (7 minutes)
 description = Collaborate with robots on slot machines
 amt_keywords = collaboration, robots
 lifetime = 24
