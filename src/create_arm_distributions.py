@@ -5,6 +5,7 @@ from random import shuffle
 num_arms = 6
 possible_payoffs = list(range(1, 5))
 expected_reward_values = [1, 1, 1, 1.5, 1.5, 2.9]
+# expected_reward_values = [1, 1, 2, 2, 3, 3]
 shuffle(expected_reward_values)
 print expected_reward_values
 

@@ -1,6 +1,8 @@
 from __future__ import division
 import numpy as np
 
+def all_argmax(arr):
+    return np.argwhere(arr == np.amax(arr)).flatten()
 def percent_agreement(human_decisions, robot_decisions):
     times_agree = 0
     interaction_length = len(robot_decisions)
@@ -9,7 +11,6 @@ def percent_agreement(human_decisions, robot_decisions):
         if human_decision in robot_decision:
             times_agree += 1
     return times_agree / interaction_length
-
 def percent_agreement_initial(human_decisions, robot_decisions):
     times_agree = 0
     interaction_length = len(robot_decisions)
@@ -19,7 +20,6 @@ def percent_agreement_initial(human_decisions, robot_decisions):
         if (human_decision - 1) in robot_decision:
             times_agree += 1
     return times_agree / interaction_length
-
 def change_mind_to_robot(before_suggest_decisions, human_decisions, robot_decisions):
     interaction_length = len(robot_decisions)
     times_changed_to_robot = 0
@@ -61,5 +61,50 @@ def policy_entropy(human_decisions, num_arms):
     for c in arm_counts:
         if c == 0:
             continue
-        entropy += -np.log(c / num_decisions) * (c / num_decisions)
+        entropy += -np.log2(c / num_decisions) * (c / num_decisions)
     return entropy
+def get_robot_name(name):
+    if name == 'random_hard_collaborate_suggest':
+        return '0.9-Greedy'
+    elif name == 'optimal2_hard_collaborate_suggest':
+        return 'HA-UCB'
+    elif name == 'greedy_hard_collaborate_suggest':
+        return '0.1-Greedy'
+    elif name == 'optimal_hard_collaborate_suggest':
+        return 'UCB'
+def time_until_all_explored(human_decisions, num_arms):
+    explored = set()
+    for i in range(30):
+        explored.add(human_decisions[i])
+        if set(range(num_arms)) <= explored:
+            return i
+    return 30
+def get_exploratory_actions(human_decisions, average_rewards):
+    exploratory = []
+    average_rewards.insert(0, [0, 0, 0, 0, 0, 0])
+    average_rewards.pop()
+
+    for i, (decision, averages) in enumerate(zip(human_decisions, average_rewards)):
+        if type(decision) == 'list':
+            if set(decision) != set(all_argmax(averages)):
+                exploratory.append(i)
+        else:
+            if decision not in all_argmax(averages):
+                exploratory.append(i)
+    return exploratory
+def entropy_over_time(human_decisions, num_arms):
+    entropies = []
+    decisions_so_far = []
+    for decision in human_decisions:
+        decisions_so_far.append(decision)
+        entropies.append(policy_entropy(decisions_so_far, num_arms))
+    return entropies
+def entropy_over_time_robot(human_decisions, robot_decisions, num_arms):
+    entropies = []
+    decisions_so_far = []
+    for i, (human_decision, robot_decision) in enumerate(zip(human_decisions, robot_decisions)):
+        decisions_copy = decisions_so_far[:]
+        decisions_copy.append(robot_decision[0])
+        entropies.append(policy_entropy(decisions_copy, num_arms))
+        decisions_so_far.append(human_decision)
+    return entropies
