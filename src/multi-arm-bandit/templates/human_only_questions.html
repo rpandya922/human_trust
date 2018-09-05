@@ -1,0 +1,67 @@
+<div id="container-questionnaire">
+    <h1>Task Complete</h1>
+
+    <hr />
+
+    <h2>Please answer the following questions.</h2>
+
+    <div class="instructions well">
+
+        <form id="postquiz" action="debrief" method="post">
+
+
+            <!-- beginning of a question -->
+            <div class="question">
+                <div class="row">
+                    <div class="col-md-12">
+                        Gender:
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <form>
+                            <label class="radio-inline"><input type="radio" name="gender" value="male">Male</label>
+                            <label class="radio-inline"><input type="radio" name="gender" value="female">Female</label>
+                            <label class="radio-inline"><input type="radio" name="gender" value="other">Other/Prefer not to answer</label>
+                      </form>
+                    </div>
+                </div>
+            </div>
+            <!-- end of a question -->
+
+            <div class="question">
+                Age:<br>
+                <input type="text" id="age" name="age">
+            </div>
+
+            <div class="question">
+                <div class="row">
+                    <div class="col-md-12">
+                        Leave any comments or suggestions you have about the study here!
+                        <br>
+                        <textarea id="comments"></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <hr />
+
+    <div class="instructionsnav">
+        <div class="row">
+            <div class="col-xs-2">
+            </div>
+            <div class="col-xs-7">
+            </div>
+            <div class="col-xs-3">
+                <button type="button" id="next" value="next" class="btn btn-primary btn-lg continue" onclick="finish()">
+                    Finish <span class="glyphicon glyphicon-arrow-right"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+</div>
