@@ -157,17 +157,17 @@ for k in user_data.keys():
         #     all_exploratory_user_traj.append(entropy_over_time(user_data[k][robot]['human_decisions'], num_arms))
         #     all_greedy_user_traj.append(entropy_over_time(user_data[k][robot]['robot_decisions'], num_arms))
 
-        if robot == "optimal2_hard_collaborate_suggest" and user_idx in exploratory_users:
+        if robot == "optimal2_hard_collaborate_suggest" and user_idx in greedy_users:
             group1_ha_ucb.append(entropy_over_time(user_data[k][robot]['human_decisions'], num_arms))
             group1_ha_ucb_robot.append(entropy_over_time_robot(user_data[k][robot]['human_decisions'], 
                 user_data[k][robot]['robot_decisions'], num_arms))
-        elif robot == "greedy_hard_collaborate_suggest" and user_idx in exploratory_users:
+        elif robot == "greedy_hard_collaborate_suggest" and user_idx in greedy_users:
             group1_greedy.append(entropy_over_time(user_data[k][robot]['human_decisions'], num_arms))
             group1_greedy_robot.append(entropy_over_time_robot(user_data[k][robot]['human_decisions'], 
                 user_data[k][robot]['robot_decisions'], num_arms))
-        elif robot == "optimal_hard_collaborate_suggest" and user_idx in exploratory_users:
+        elif robot == "optimal_hard_collaborate_suggest" and user_idx in greedy_users:
             group1_ucb.append(entropy_over_time(user_data[k][robot]['human_decisions'], num_arms))
-        elif robot == "random_hard_collaborate_suggest" and user_idx in exploratory_users:
+        elif robot == "random_hard_collaborate_suggest" and user_idx in greedy_users:
             group1_random.append(entropy_over_time(user_data[k][robot]['human_decisions'], num_arms))
 
         all_robot_scores.append(total_reward)
@@ -203,11 +203,11 @@ if entropy_plots:
     std_errors_exploratory = [np.std(all_exploratory_user_traj[:,i]) / np.sqrt(len(all_exploratory_user_traj)) for i in range(30)]
     avg_exploratory_traj = np.average(all_exploratory_user_traj, axis=0)
 
-    plt.plot(np.arange(30), avg_greedy_traj, label="Group 1", color='C2', linewidth=3)
-    ax.fill_between(np.arange(30), avg_greedy_traj - std_errors_greedy, avg_greedy_traj + std_errors_greedy, alpha=0.3, color='C2')
+    plt.plot(np.arange(30), avg_greedy_traj, label="Group 1", color='#5b9bd5', linewidth=3)
+    ax.fill_between(np.arange(30), avg_greedy_traj - std_errors_greedy, avg_greedy_traj + std_errors_greedy, alpha=0.3, color='#5b9bd5')
 
-    plt.plot(np.arange(30), avg_exploratory_traj, label="Group 2", color='C3', linewidth=3)
-    ax.fill_between(np.arange(30), avg_exploratory_traj - std_errors_exploratory, avg_exploratory_traj + std_errors_exploratory, alpha=0.3, color='C3')
+    plt.plot(np.arange(30), avg_exploratory_traj, label="Group 2", color='#ed7d31', linewidth=3)
+    ax.fill_between(np.arange(30), avg_exploratory_traj - std_errors_exploratory, avg_exploratory_traj + std_errors_exploratory, alpha=0.3, color='#ed7d31')
     
     ax.plot(np.arange(30), np.ones(30)*2.5849, linestyle='--', color='k', label='Maximum Entropy', linewidth=3)
     ax.set_xlim(0, 29)
@@ -242,22 +242,22 @@ if entropy_plots:
     std_errors_group1_random = [np.std(group1_random[:,i]) / np.sqrt(len(group1_random)) for i in range(30)]
     avg_group1_random = np.average(group1_random, axis=0)
 
-    # plt.plot(np.arange(30), avg_greedy_traj, label="Training", color='C2', linewidth=3)
-    # ax.fill_between(np.arange(30), avg_greedy_traj - std_errors_greedy, avg_greedy_traj + std_errors_greedy, alpha=0.3, color='C2')
-    plt.plot(np.arange(30), avg_exploratory_traj, label="Training", color='C2', linewidth=3)
-    ax.fill_between(np.arange(30), avg_exploratory_traj - std_errors_exploratory, avg_exploratory_traj + std_errors_exploratory, alpha=0.3, color='C2')
+    plt.plot(np.arange(30), avg_greedy_traj, label="Training", color='#a5a5a5', linewidth=3)
+    ax.fill_between(np.arange(30), avg_greedy_traj - std_errors_greedy, avg_greedy_traj + std_errors_greedy, alpha=0.3, color='#a5a5a5')
+    # plt.plot(np.arange(30), avg_exploratory_traj, label="Training", color='#a5a5a5', linewidth=3)
+    # ax.fill_between(np.arange(30), avg_exploratory_traj - std_errors_exploratory, avg_exploratory_traj + std_errors_exploratory, alpha=0.3, color='#a5a5a5')
 
-    plt.plot(np.arange(30), avg_group1_ha_ucb, label="HA-UCB", color='C0', linewidth=3)
+    plt.plot(np.arange(30), avg_group1_ha_ucb, label="HA-UCB", color='#4472c4', linewidth=3)
     ax.fill_between(np.arange(30), avg_group1_ha_ucb - std_errors_group1_ha_ucb, 
-        avg_group1_ha_ucb + std_errors_group1_ha_ucb, alpha=0.3, color='C0')
+        avg_group1_ha_ucb + std_errors_group1_ha_ucb, alpha=0.3, color='#4472c4')
 
     # plt.plot(np.arange(30), avg_group1_ha_ucb_robot, label="HA-UCB Agent", color='C0', linewidth=3, linestyle='--')
     # ax.fill_between(np.arange(30), avg_group1_ha_ucb_robot - std_errors_group1_ha_ucb_robot, 
     #     avg_group1_ha_ucb_robot + std_errors_group1_ha_ucb_robot, alpha=0.3, color='C0')
 
-    plt.plot(np.arange(30), avg_group1_greedy, label="0.1-Greedy", color='C1', linewidth=3)
+    plt.plot(np.arange(30), avg_group1_greedy, label="0.1-Greedy", color='#ffc000', linewidth=3)
     ax.fill_between(np.arange(30), avg_group1_greedy - std_errors_group1_greedy, 
-        avg_group1_greedy + std_errors_group1_greedy, alpha=0.3, color='C1')
+        avg_group1_greedy + std_errors_group1_greedy, alpha=0.3, color='#ffc000')
 
     # plt.plot(np.arange(30), avg_group1_greedy_robot, label="0.1-Greedy Agent", color='C1', linewidth=3, linestyle='--')
     # ax.fill_between(np.arange(30), avg_group1_greedy_robot - std_errors_group1_greedy_robot, 

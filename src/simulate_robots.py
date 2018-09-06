@@ -53,24 +53,29 @@ def entropy_over_time(decisions, num_arms):
 # payoff_matrices = []
 epsilons = []
 robots = []
+plot_colors = []
 if args.ucb:
     epsilons.append(0)
     robots.append("UCB")
+    plot_colors.append("#70ad47")
 if args.ucb2: 
     epsilons.append(0)
     robots.append("HA-UCB")
+    plot_colors.append("#4472c4")
 if args.gittins:
     epsilons.append(0)
     robots.append("gittins")
 if args.greedy:
     epsilons.append(0.1)
     robots.append("0.1-Greedy")
+    plot_colors.append("#ffc000")
 if args.greedy2:
     epsilons.append(0.3)
     robots.append("0.3-Greedy")
 if args.random:
     epsilons.append(0.9)
     robots.append("0.9-Greedy")
+    plot_colors.append("#262626")
 if args.random2:
     epsilons.append(1)
     robots.append("1-Greedy")
@@ -91,7 +96,7 @@ payoff_matrix = np.array([[ 0.25      ,  0.5       ,  0.25      ,  0.        ,  
 all_total_rewards = []
 all_entropies = []
 fig, ax = plt.subplots()
-plot_colors = ['C1', 'C0', 'C2', 'C3']
+
 for robot_idx, robot in enumerate(robots):
     # payoff_matrix = payoff_matrices[i]
     epsilon = epsilons[robot_idx]
